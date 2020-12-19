@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.platform.mall.dao.order.mapper.MallOrderDeliveryMapper">
+
+    <resultMap type="com.platform.mall.dao.order.entity.MallOrderDelivery" id="mallOrderDeliveryMap">
+        <result property="id" column="id" />
+        <result property="orderNo" column="order_no" />
+        <result property="orderId" column="order_id" />
+        <result property="memberId" column="member_id" />
+        <result property="openid" column="openid" />
+        <result property="appId" column="app_id" />
+        <result property="unionId" column="union_id" />
+        <result property="deliveryCompanyName" column="delivery_company_name" />
+        <result property="deliveryNo" column="delivery_no" />
+        <result property="deliveryTime" column="delivery_time" />
+        <result property="province" column="province" />
+        <result property="city" column="city" />
+        <result property="area" column="area" />
+        <result property="address" column="address" />
+
+        <result property="isDelete" column="is_delete" />
+        <result property="createUser" column="create_user" />
+        <result property="createTime" column="create_time" />
+        <result property="updateUser" column="update_user" />
+        <result property="updateDatetime" column="update_datetime" />
+
+        <result property="tenantId" column="tenant_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+id,order_no,member_id,openid,app_id,
+union_id,delivery_company_name,delivery_no,delivery_time,province,
+city,area,address,list_order,is_delete,
+create_user,create_time,update_user,update_datetime,
+tenant_id    </sql>
+</mapper>

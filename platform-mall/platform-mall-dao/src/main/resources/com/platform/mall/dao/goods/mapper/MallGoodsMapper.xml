@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.platform.mall.dao.goods.mapper.MallGoodsMapper">
+
+    <resultMap type="com.platform.mall.dao.goods.entity.MallGoods" id="mallGoodsMap">
+        <result property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="title" column="title" />
+        <result property="code" column="code" />
+        <result property="typeId" column="type_id" />
+        <result property="parentTypeId" column="parent_type_id" />
+        <result property="brandId" column="brand_id" />
+        <result property="goodsType" column="goods_type" />
+        <result property="stock" column="stock" />
+        <result property="stockWarn" column="stock_warn" />
+        <result property="auditStatus" column="audit_status" />
+        <result property="onUnSale" column="on_un_sale" />
+        <result property="logo" column="logo" />
+        <result property="proposedPrice" column="proposed_price" />
+        <result property="price" column="price" />
+        <result property="shareDesc" column="share_desc" />
+        <result property="isRecommand" column="is_recommand" />
+        <result property="isRefund" column="is_refund" />
+        <result property="weight" column="weight" />
+        <result property="unit" column="unit" />
+        <result property="isDelete" column="is_delete" />
+        <result property="createUser" column="create_user" />
+        <result property="createTime" column="create_time" />
+        <result property="updateUser" column="update_user" />
+        <result property="updateDatetime" column="update_datetime" />
+        <result property="tenantId" column="tenant_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        mg.id,NAME,title,CODE,type_id,brand_id,
+        goods_type,stock,stock_warn,audit_status,on_un_sale,
+        logo,picture_url,proposed_price,price,share_desc,is_recommand,
+        is_refund,,weight,unit,mg.is_delete,mg.create_user,mg.create_time,mg.update_user,
+        mg.update_datetime,mg.tenant_id
+    </sql>
+
+    <select id="queryGoodsDetail" parameterType="java.lang.Long" resultType="com.platform.mall.dao.goods.model.detail.MallGoodsDetailDto">
+        select
+        <include refid="Base_Column_List" />,mgc.describe_info,mgc.picture_url
+        FROM
+        mall_goods mg
+        LEFT JOIN mall_goods_config mgc ON mg.id = mgc.goods_id
+        WHERE
+        mg.id = #{id,jdbcType=BIGINT}
+    </select>
+
+  <!-- 更新库存 -->
+  <update id="updateGoodsStock"  >
+
+    update mall_goods mg
+    set mg.stock = mg.stock-#{number}
+    where id=#{id}
+
+  </update>
+
+  <!-- 更新库存 -->
+  <update id="updateGoodStockBack"  >
+
+    update mall_goods mg
+    set mg.stock = mg.stock+#{number}
+    where id=#{id}
+
+  </update>
+
+    <!-- 取消订单、返回库存 -->
+    <update id="updateGoodStockBack" parameterType="java.lang.Long" >
+
+    update mall_goods mg inner join (
+    select moi.goods_id ,moi.number
+    from mall_order_item  moi
+    where moi.order_no = #{orderNo,jdbcType=BIGINT}
+    ) b on mg.id =b.goods_id
+    set mg.stock=mg.stock+b.number
+
+  </update>
+</mapper>

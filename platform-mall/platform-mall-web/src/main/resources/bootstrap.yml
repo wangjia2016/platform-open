@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    nacos:
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
+  application:
+    name: platform-mall
+#  profiles:
+#    active: dev

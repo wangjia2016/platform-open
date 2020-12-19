@@ -1,0 +1,32 @@
+spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  profiles: common
+
+#feign配置
+feign:
+  client:
+    config:
+      # 想要调用的微服务的名称 default表示全局
+      default:
+        loggerLevel: full
+        requestInterceptors:
+          - com.platform.common.interceptor.TokenRequestIntecepor
+  httpclient:
+    #让feign 使用apache httpclient发送请求，而不是默认的URLConnection
+    enabled: true
+    # feign的最大连接数 最优参数需要结合压测调整
+    max-connections: 200
+    # feign单个路径的最大连接数 最优参数需要结合压测调整
+    max-connections-per-route: 50
+
+jwt:
+  secret: 371620923838562304831ff6f46941461f8a1fa5090b0223d5
+  # 有效期，单位秒，默认2周
+  expire-time-in-second: 1209600
+
+mybatis-plus:
+  mapper-locations: classpath*:com/platform/**/dao/**/*.xml

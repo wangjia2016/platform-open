@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.platform.mall.dao.order.mapper.MallOrderMapper">
+
+    <resultMap type="com.platform.mall.dao.order.entity.MallOrder" id="mallOrderMap">
+        <result property="id" column="id" />
+        <result property="orderNo" column="order_no" />
+        <result property="memberId" column="member_id" />
+        <result property="goodsPrice" column="goods_price" />
+        <result property="freight" column="freight" />
+        <result property="deductionAmount" column="deduction_amount" />
+        <result property="couponAmount" column="coupon_amount" />
+        <result property="actualAmount" column="actual_amount" />
+        <result property="concessionaryAmount" column="concessionary_amount" />
+        <result property="totalAmount" column="total_amount" />
+        <result property="useCredit" column="use_credit" />
+        <result property="deliveryType" column="delivery_type" />
+        <result property="rechargeBalance" column="recharge_balance" />
+        <result property="payType" column="pay_type" />
+        <result property="payTime" column="pay_time" />
+        <result property="payStatus" column="pay_status" />
+        <result property="orderStatus" column="order_status" />
+        <result property="closeReason" column="close_reason" />
+        <result property="receiver" column="receiver" />
+        <result property="contact" column="contact" />
+        <result property="openid" column="openid" />
+        <result property="appId" column="app_id" />
+        <result property="unionId" column="union_id" />
+        <result property="transactionId" column="transaction_id" />
+        <result property="distributorId" column="distributor_id" />
+        <result property="remark" column="remark" />
+        <result property="applyRefundTime" column="apply_refund_time" />
+        <result property="refundId" column="refund_id" />
+        <result property="refundDesc" column="refund_desc" />
+        <result property="refundTime" column="refund_time" />
+        <result property="couponAttr" column="coupon_attr" />
+        <result property="reserveTime" column="reserve_time" />
+        <result property="businessType" column="business_type" />
+        <result property="clientType" column="client_type" />
+        <result property="goodsType" column="goods_type" />
+        <result property="original" column="original" />
+        <result property="isDelete" column="is_delete" />
+        <result property="createUser" column="create_user" />
+        <result property="createTime" column="create_time" />
+        <result property="updateUser" column="update_user" />
+        <result property="updateDatetime" column="update_datetime" />
+
+        <result property="tenantId" column="tenant_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        id,order_no,member_id,goods_price,freight,
+        deduction_amount,coupon_amount,actual_amount,concessionary_amount,total_amount,
+        use_credit,delivery_type,recharge_balance,pay_type,pay_time,
+        pay_status,order_status,close_reason,receiver,contact,
+        openid,app_id,union_id,transaction_id,distributor_id,
+        remark,apply_refund_time,refund_id,refund_desc,refund_time,
+        coupon_attr,reserve_time,business_type,client_type,goods_type,
+        original,is_delete,create_time,update_datetime,
+        tenant_id
+    </sql>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.platform.mall.dao.order.mapper.MallCartMapper">
+
+    <resultMap type="com.platform.mall.dao.order.entity.MallCart" id="mallCartMap">
+        <result property="id" column="id" />
+        <result property="memberId" column="member_id" />
+        <result property="goodsId" column="goods_id" />
+        <result property="number" column="number" />
+        <result property="openid" column="openid" />
+        <result property="appId" column="app_id" />
+        <result property="unionId" column="union_id" />
+        <result property="distributorId" column="distributor_id" />
+        <result property="deliveryType" column="delivery_type" />
+        <result property="skuId" column="sku_id" />
+        <result property="skuAttr" column="sku_attr" />
+        <result property="isDelete" column="is_delete" />
+        <result property="createUser" column="create_user" />
+        <result property="createTime" column="create_time" />
+        <result property="updateUser" column="update_user" />
+        <result property="updateDatetime" column="update_datetime" />
+
+        <result property="tenantId" column="tenant_id" />
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+id,user_id,goods_id,number,openid,
+app_id,union_id,distributor_id,delivery_type,sku_id,
+sku_attr,is_delete,create_user,create_time,update_user,
+update_datetime,tenant_id    </sql>
+</mapper>
