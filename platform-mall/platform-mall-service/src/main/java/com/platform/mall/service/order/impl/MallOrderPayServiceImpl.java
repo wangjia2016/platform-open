@@ -3,12 +3,10 @@ package com.platform.mall.service.order.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.platform.common.result.Result;
 import com.platform.common.util.DateTimeUtil;
-import com.platform.mall.dao.basic.MallGoodsConstant;
 import com.platform.mall.dao.basic.MallOrderStatusConstant;
 
 import com.platform.mall.dao.basic.PayConsts;
 import com.platform.mall.dao.order.entity.MallOrder;
-import com.platform.mall.dao.order.entity.MallOrderItem;
 import com.platform.mall.dao.order.mapper.MallOrderItemMapper;
 import com.platform.mall.dao.order.mapper.MallOrderMapper;
 import com.platform.mall.dao.order.model.list.WxPayOrderNotifyResult;
@@ -22,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 /**
  * @Description
@@ -83,22 +80,14 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
         final MallOrder mallOrder = mallOrderMapper.selectOne(new QueryWrapper<MallOrder>().lambda()
                 .in(MallOrder::getOrderNo, wxPayOrderNotifyResult.getOutTradeNo()));
 
-        //2、更改订单状态 设置待收货 待核销？
+        //1、更改订单状态 设置待收货 待核销？
         mallOrder.setOrderStatus(MallOrderStatusConstant.TO_RECEIVE.getTypeValue());
         mallOrder.setTransactionId(wxPayOrderNotifyResult.getTransactionId());
         mallOrder.setPayTime(DateTimeUtil.parseDate(wxPayOrderNotifyResult.getTimeEnd(),"yyyyMMddHHmmss"));
         mallOrder.setPayStatus(0);
         mallOrderMapper.updateById(mallOrder);
-
-        //3、 虚拟商品生成核销码
-        if(MallGoodsConstant.VIRTUAL.getTypeValue().equals(mallOrder.getGoodsType())){
-            //查询订单项
-            List<MallOrderItem> mallOrderItems = mallOrderItemMapper.selectList(new QueryWrapper<MallOrderItem>().lambda()
-                    .in(MallOrderItem::getOrderId, mallOrder.getId()));
-        }else{
-            //实物 发送消息通知管理员
-            mallOrderService.asyncMsgProcess(mallOrder);
-        }
+        //2、 发送消息通知管理员
+        mallOrderService.asyncMsgProcess(mallOrder);
         return true;
     }
 

@@ -22,15 +22,6 @@ import java.util.List;
 public interface MallOrderService extends IService<MallOrder> {
 
     /**
-     * @Description 查询MallOrder列表不分页
-     * @Param MallOrderDto
-     * @return
-     * @Author wangjia
-     * @Date 2020-10-02 17:06:55
-     **/
-    List<MallOrderListDto> listMallOrder(MallOrderQuery mallOrderQuery);
-
-    /**
      * @Description 根据MallOrderDto查询一条MallOrder记录
      * @Param MallOrderDto
      * @return
@@ -38,7 +29,6 @@ public interface MallOrderService extends IService<MallOrder> {
      * @Date 2020-10-02 17:06:55
      **/
     MallOrderDetailDto getOne(MallOrderQuery mallOrderQuery);
-
 
     /**
      * @Description 根据MallOrderDto查询一条MallOrder记录
@@ -48,16 +38,6 @@ public interface MallOrderService extends IService<MallOrder> {
      * @Date 2020-10-02 17:06:55
      **/
     MallOrderDetailDto orderDetail(Long id);
-
-    /**
-     * @Description 发货
-     * @Param MallOrderDto mallOrderDeliveryQuery
-     * @return Boolean
-     * @Author wangjia
-     * @Date 2020-10-24 13:33:55
-     **/
-    @Transactional(rollbackFor = Exception.class)
-    Boolean delivery(MallOrderDeliveryQuery mallOrderDeliveryQuery);
 
     /**
      * @Description 普通-提交订单

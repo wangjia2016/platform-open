@@ -25,8 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MallOrderPayPortalController {
 
-    private final MallOrderService mallOrderService;
-
     private final MallOrderPayService mallOrderPayService;
 
     /**
@@ -63,6 +61,4 @@ public class MallOrderPayPortalController {
         }
         return Result.fail("订单处理异常");
     }
-
-
 }

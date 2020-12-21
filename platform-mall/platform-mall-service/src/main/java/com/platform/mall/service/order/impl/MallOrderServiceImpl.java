@@ -1,6 +1,5 @@
 package com.platform.mall.service.order.impl;
 
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.platform.common.enums.MallCacheKey;
 import com.platform.common.exception.BusinessException;
 import com.platform.common.result.Result;
@@ -42,7 +41,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -51,7 +49,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platform.mall.dao.order.mapper.MallOrderMapper;
 import com.platform.mall.dao.order.entity.MallOrder;
 import com.platform.mall.service.order.MallOrderService;
-import com.platform.mall.dao.order.model.list.MallOrderListDto;
 import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
 import com.platform.mall.dao.order.convert.MallOrderConverter;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,15 +82,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
     private final MallGoodsCacheManager mallGoodsCacheManager;
 
     @Override
-    public List<MallOrderListDto> listMallOrder(MallOrderQuery mallOrderQuery) {
-        List<MallOrder> mallOrderList = this.baseMapper.selectList(new QueryWrapper<MallOrder>().lambda()
-                .eq(MallOrder::getTenantId,mallOrderQuery.getTenantId()));
-
-        List<MallOrderListDto> MallOrderListDtoList = MallOrderConverter.INSTANCE.toListDTO(mallOrderList);
-        return MallOrderListDtoList;
-    }
-
-    @Override
     public MallOrderDetailDto getOne(MallOrderQuery mallOrderQuery) {
         MallOrder mallOrder = this.getOne(new QueryWrapper<MallOrder>().lambda()
                         .eq(MallOrder::getTenantId,mallOrderQuery.getTenantId()),
@@ -114,37 +102,7 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         List<MallOrderItemListDto> mallOrderItemListDtos = MallOrderItemConverter.INSTANCE.toListDTO(mallOrderItems);
         orderDetail.setListMallOrderItem(mallOrderItemListDtos);
 
-        if(mallOrder.getDeliveryType()!=null&&mallOrder.getDeliveryType()==1){
-            //查询物流信息
-            MallOrderDelivery mallOrderDelivery = mallOrderDeliveryMapper.selectOne(new QueryWrapper<MallOrderDelivery>().lambda()
-                    .eq(MallOrderDelivery::getOrderId, id));
-            MallOrderDeliveryDetailDto mallOrderDeliveryDetailDto = MallOrderDeliveryConverter.INSTANCE.toDTO(mallOrderDelivery);
-            orderDetail.setMallOrderDelivery(mallOrderDeliveryDetailDto);
-        }
         return orderDetail;
-    }
-
-    @Override
-    public Boolean delivery(MallOrderDeliveryQuery mallOrderDeliveryQuery) {
-        MallOrderDelivery mallOrderDelivery = mallOrderDeliveryMapper.selectOne(new QueryWrapper<MallOrderDelivery>().lambda()
-                .eq(MallOrderDelivery::getOrderNo, mallOrderDeliveryQuery.getOrderNo()));
-
-        if(mallOrderDelivery==null){
-            throw new BusinessException("订单物流信息不存在，发货失败");
-        }
-        mallOrderDelivery.setDeliveryCompanyName(mallOrderDeliveryQuery.getDeliveryCompanyName());
-        mallOrderDelivery.setDeliveryNo(mallOrderDeliveryQuery.getDeliveryNo());
-        mallOrderDelivery.setDeliveryTime(new Date());
-        int mallOrderDeliveryResult = mallOrderDeliveryMapper.updateById(mallOrderDelivery);
-
-        //2、修改订单状态
-        MallOrder mallOrder = MallOrder.builder().id(mallOrderDelivery.getOrderId()).build();
-        mallOrder.setOrderStatus(3);
-        mallOrder.setUpdateDatetime(new Date());
-        int mallOrderResult = mallOrderMapper.updateById(mallOrder);
-
-        //3、记录操作日志
-        return SqlHelper.retBool(mallOrderDeliveryResult);
     }
 
     @Override
@@ -209,10 +167,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         SendResult sendResult = rocketMQTemplate.syncSend("cancel-normal-mall-order:cancelNormalOrderTag",
                 MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),5000,18);
         log.info("cancel-normal-mall-order 延时消息发送:",sendResult.toString());
-        //发送支付提醒消息到MQ 提前一个小时提醒
-//        SendResult payResult = rocketMQTemplate.syncSend("normal-mall-order-to-pay:cancelNormalOrderTag",
-//                MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),5000,17);
-//        log.info("normal-mall-order-to-pay 待支付提醒消息发送:",payResult.toString());
 
         if(batchResult&&insert>0){
             return true;
@@ -249,17 +203,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 log.info("下单必要参数[number]为空,下单失败");
                 return false;
             }
-            //MallGoodsDetailDto mallGoods = mallGoodsCacheManager.getMallGoods(mallCartRequestQuery.getId());
-//
-//            Integer stock = (Integer) redisTemplate.opsForValue().get(MallCacheKey.NORMAL_GOODS_SEMAPHORE_PREFIX.getTypeValue() + goodsId);
-//            //缓存里面数据为空 - 加载数据库？
-//            if(mallGoods == null){
-//                log.info("商品为空,下单失败");
-//                return false;
-//            }
-            // 上下架校验
-            // 售卖时间校验
-            // 删除校验
         }
         return true;
     }
@@ -277,11 +220,9 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             if(mallGoods == null){
                 log.info("商品为空,下单失败");
                 throw new BusinessException("商品为空,下单失败");
-                //return false;
             }
             //库存校验
             if(stock<=0||number>stock){
-                //商品名称取缓存的值？
                 log.info("商品{},库存不足,下单失败",mallCartRequestQuery.getGoodsName());
                 return false;
             }
@@ -374,8 +315,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         Long orderNo = snowFlakeIdGenerator.nextId();
         //创建订单对象
         //发送消息到MQ 這裡購物車裡面應該是發送一條消息，不應該是多條消息
-        //MallOrderMsgProtocol mallOrderMsgProtocol = MallOrderConverter.INSTANCE.toMallOrderMsgProtocol(mallOrderRequestQuery);
-       // mallOrderMsgProtocol.setOrderNo(orderNo);
         mallOrderRequestQuery.setOrderNo(orderNo);
         SendResult sendResult = rocketMQTemplate.syncSend("create-normal-mall-order:createNormalOrderTag",
                 MessageBuilder.withPayload(JsonUtil.object2Json(mallOrderRequestQuery)).setHeader(RocketMQHeaders.KEYS, orderNo).build());
@@ -388,8 +327,5 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             //发送失败，需要做业务补偿，重新发送
             return false;
         }
-        //return false;
-        //Integer stock = (Integer) redisTemplate.opsForValue().get(goodsId);
-
     }
 }

@@ -1,18 +1,16 @@
 package com.platform.mall.web.controller.portal;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.platform.common.auth.CheckAuthentication;
 import com.platform.common.result.Result;
+import com.platform.mall.dao.order.convert.MallOrderConverter;
 import com.platform.mall.dao.order.entity.MallOrder;
 import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
-import com.platform.mall.dao.order.model.query.MallOrderPortalQuery;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.service.order.MallOrderService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -73,11 +71,9 @@ public class MallOrderPortalController {
      **/
     @ApiOperation("订单状态")
     @GetMapping("/orderStatus")
-    public Result<MallOrder> orderStatus(@RequestParam(value = "id") Long id){
+    public Result<MallOrderDetailDto> orderStatus(@RequestParam(value = "id") Long id){
 
-        // TODO 需要转化 不能直接返回实体
-        MallOrder mallOrder = mallOrderService.getById(id);
-        return Result.success(mallOrder);
+        return Result.success(MallOrderConverter.INSTANCE.toDTO(mallOrderService.getById(id)));
     }
 
     /**
@@ -105,7 +101,6 @@ public class MallOrderPortalController {
     @PostMapping("/cancelOrder")
     public Result cancelOrder(@RequestParam(value = "id") Long id,
                               @RequestParam(value = "reason") String reason) {
-
         return mallOrderService.cancelOrder(id,reason);
     }
 

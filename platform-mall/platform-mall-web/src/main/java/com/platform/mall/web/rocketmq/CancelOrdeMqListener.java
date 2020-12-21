@@ -42,12 +42,9 @@ public class CancelOrdeMqListener implements RocketMQListener<String> , RocketMQ
 
     @Override
     public void prepareStart(DefaultMQPushConsumer consumer) {
-
         //每次拉取间隔，单位毫秒
         consumer.setPullInterval(2000);
         //每次从队列中拉取的消息数
         consumer.setPullBatchSize(100);
     }
-
-
 }

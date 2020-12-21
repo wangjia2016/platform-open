@@ -33,7 +33,6 @@ public class MallBasicPortalController {
         userInfo.put("id", 123);
         userInfo.put("nickname", "WJ");
         userInfo.put("openid","oyGl81esbPplX1kZwWocI0Dvb5Mc");
-        //userInfo.put("role", user.getRoles());
 
         String token = jwtOperator.generateToken(userInfo);
         return Result.success(token);
