@@ -90,5 +90,8 @@ public interface MallOrderService extends IService<MallOrder> {
      * 异步发送微信模板消息处理
      * */
     void asyncMsgProcess(MallOrder mallOrder);
+
+
+    Boolean preCreateOrder(MallOrderRequestQuery mallOrderRequest);
 }
 

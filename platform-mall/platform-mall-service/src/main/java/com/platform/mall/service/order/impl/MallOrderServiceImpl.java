@@ -328,4 +328,24 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             return false;
         }
     }
+
+    @Override
+    public Boolean preCreateOrder(MallOrderRequestQuery mallOrderRequestQuery) {
+        //幂等性处理 - 防重放攻击
+
+        if(!this.checkOrderParam(mallOrderRequestQuery)){
+            return false;
+        }
+        if(!this.checkStock(mallOrderRequestQuery)){
+            return false;
+        }
+
+        if(!CollectionUtils.isEmpty(mallOrderRequestQuery.getListMallGoods())){
+            if(this.preReduceStock(mallOrderRequestQuery)){
+                // TODO 返回false的情況需要處理
+                return true;
+            }
+        }
+        return false;
+    }
 }

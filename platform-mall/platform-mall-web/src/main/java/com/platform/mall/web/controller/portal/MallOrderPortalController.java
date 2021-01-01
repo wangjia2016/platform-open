@@ -1,7 +1,9 @@
 package com.platform.mall.web.controller.portal;
 
+import com.platform.common.annotation.CheckIdempotent;
 import com.platform.common.auth.CheckAuthentication;
 import com.platform.common.result.Result;
+import com.platform.common.util.UUIDUtils;
 import com.platform.mall.dao.order.convert.MallOrderConverter;
 import com.platform.mall.dao.order.entity.MallOrder;
 import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
@@ -12,6 +14,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +36,8 @@ public class MallOrderPortalController {
 
     private final MallOrderService mallOrderService;
 
+    private final RedisTemplate redisTemplate;
+
     /**
      * @Description 提交订单
      * @Param mallCartQuery
@@ -43,22 +48,27 @@ public class MallOrderPortalController {
     @PostMapping("/createOrder")
     @ApiOperation("提交订单")
     @CheckAuthentication
+    @CheckIdempotent(true)
     public Result<MallOrderDetailDto> createOrder(@Valid @RequestBody MallOrderRequestQuery mallOrderRequest){
 
-        if(!mallOrderService.checkOrderParam(mallOrderRequest)){
-            return Result.fail("参数校验失败");
+        //        if(!mallOrderService.checkOrderParam(mallOrderRequest)){
+//            return Result.fail("参数校验失败");
+//        }
+//        if(!mallOrderService.checkStock(mallOrderRequest)){
+//            return Result.fail("商品庫存不足");
+//        }
+//
+//        if(!CollectionUtils.isEmpty(mallOrderRequest.getListMallGoods())){
+//            if(mallOrderService.preReduceStock(mallOrderRequest)){
+//                // TODO 返回false的情況需要處理
+//                return Result.success("您的订单处理中，请稍后支付");
+//            }
+//        }
+        final Boolean result = mallOrderService.preCreateOrder(mallOrderRequest);
+        if(result){
+            return Result.success("您的订单处理中，请稍后支付");
         }
-        if(!mallOrderService.checkStock(mallOrderRequest)){
-            return Result.fail("商品庫存不足");
-        }
-
-        if(!CollectionUtils.isEmpty(mallOrderRequest.getListMallGoods())){
-            if(mallOrderService.preReduceStock(mallOrderRequest)){
-                // TODO 返回false的情況需要處理
-                return Result.success("您的订单处理中，请稍后支付");
-            }
-        }
-        return Result.fail("下單異常");
+        return Result.fail("下单异常");
     }
 
 
@@ -102,6 +112,18 @@ public class MallOrderPortalController {
     public Result cancelOrder(@RequestParam(value = "id") Long id,
                               @RequestParam(value = "reason") String reason) {
         return mallOrderService.cancelOrder(id,reason);
+    }
+
+    /**
+     * 获取幂等性token
+     *
+     * @return
+     */
+    @GetMapping("/getIdempotent")
+    public Result getIdempotent() {
+        String token = UUIDUtils.getUUID32();
+        redisTemplate.opsForValue().set(token, "1");
+        return Result.success(token);
     }
 
 }
