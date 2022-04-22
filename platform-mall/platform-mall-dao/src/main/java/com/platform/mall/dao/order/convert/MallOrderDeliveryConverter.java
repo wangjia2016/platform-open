@@ -30,4 +30,7 @@ public interface MallOrderDeliveryConverter {
     MallOrderDelivery fromQuery(MallOrderDeliveryQuery query);
 
     MallOrderDelivery fromMallOrderRequestQuery(MallOrderRequestQuery query);
+
+    MallOrderDelivery fromMallOrderFlashRequestQuery(MallOrderRequestQuery mallOrderFlashRequestQuery);
+
 }

@@ -39,7 +39,7 @@ public class MallOrderPortalController {
     private final RedisTemplate redisTemplate;
 
     /**
-     * @Description 提交订单
+     * @Description 提交订单 幂等性校验
      * @Param mallCartQuery
      * @return Result
      * @Author wangjia
@@ -50,20 +50,6 @@ public class MallOrderPortalController {
     @CheckAuthentication
     @CheckIdempotent(true)
     public Result<MallOrderDetailDto> createOrder(@Valid @RequestBody MallOrderRequestQuery mallOrderRequest){
-
-        //        if(!mallOrderService.checkOrderParam(mallOrderRequest)){
-//            return Result.fail("参数校验失败");
-//        }
-//        if(!mallOrderService.checkStock(mallOrderRequest)){
-//            return Result.fail("商品庫存不足");
-//        }
-//
-//        if(!CollectionUtils.isEmpty(mallOrderRequest.getListMallGoods())){
-//            if(mallOrderService.preReduceStock(mallOrderRequest)){
-//                // TODO 返回false的情況需要處理
-//                return Result.success("您的订单处理中，请稍后支付");
-//            }
-//        }
         final Boolean result = mallOrderService.preCreateOrder(mallOrderRequest);
         if(result){
             return Result.success("您的订单处理中，请稍后支付");

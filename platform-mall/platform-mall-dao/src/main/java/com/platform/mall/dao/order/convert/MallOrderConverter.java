@@ -30,6 +30,7 @@ public interface MallOrderConverter {
 
     MallOrder fromQuery(MallOrderQuery query);
 
+    MallOrder fromMallOrderFlashRequestQuery(MallOrderRequestQuery mallOrderFlashRequestQuery);
 
     MallOrder fromMallOrderPortalQuery(MallOrderPortalQuery query);
 

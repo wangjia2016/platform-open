@@ -49,15 +49,6 @@ public interface MallOrderService extends IService<MallOrder> {
     Boolean createOrder(MallOrderRequestQuery mallOrderRequestQuery);
 
     /**
-     * @Description 普通-参数校验
-     * @Param mallOrderRequestQuery
-     * @return
-     * @Author wangjia
-     * @Date 2020-10-6 17:06:55
-     **/
-    Boolean checkOrderParam(MallOrderRequestQuery mallOrderRequestQuery);
-
-    /**
      * @Description 预扣库存
      * @Param goodsId
      * @Param num

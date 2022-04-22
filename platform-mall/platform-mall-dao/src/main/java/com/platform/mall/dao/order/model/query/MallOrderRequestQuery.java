@@ -25,14 +25,14 @@ public class MallOrderRequestQuery  {
 	@ApiModelProperty("会员编号")
 	private Long memberId;
 
-//	@ApiModelProperty("订单id-前端不需要传")
-//	private Long id;
-
-	@ApiModelProperty("订单编号-前端不用传")
-	private Long orderNo;
-
 	@ApiModelProperty("用户openid")
 	private String openid;
+
+	@ApiModelProperty("订单id")
+	private Long orderId;
+
+	@ApiModelProperty("订单no")
+	private Long orderNo;
 
 	@ApiModelProperty("1 物流配送 2到店自提")
 	private Integer deliveryType;
@@ -81,6 +81,15 @@ public class MallOrderRequestQuery  {
 
 	@ApiModelProperty("购物车-订单项")
 	private List<MallCartRequestQuery> listMallGoods;
+
+	@ApiModelProperty("秒杀场次id")
+	private Long sessionsId;
+
+	@ApiModelProperty("商品编号")
+	private Long goodsId;
+
+	@ApiModelProperty("数量")
+	private Integer number;
 
 	private String tenantId;
 

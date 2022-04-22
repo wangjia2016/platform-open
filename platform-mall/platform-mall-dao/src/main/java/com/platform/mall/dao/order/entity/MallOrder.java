@@ -235,6 +235,10 @@ public class MallOrder implements Serializable {
 	 */
 	private Date updateDatetime;
 
+	/**
+	 * 秒杀场次id
+	 * */
+	private Long sessionsId;
 
 	/**
 	 * 租户id
