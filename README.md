@@ -1,4 +1,4 @@
-本项目持续完善中...
+本项目持续完善中... 具体技术 详解&业务设计，参见WIKI
 ## 1.项目说明
 - 本项目基于SpringCloud Hoxton.SR8 &SpringCloud Alibaba 2.2.3.RELEASE 最新版;
 - 关于SpirngCloud、SpringCloudAlibaba、SpringBoot 三者的版本依赖关系 参见SpringCloud官方文档
