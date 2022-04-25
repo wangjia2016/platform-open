@@ -33,7 +33,7 @@
   幂等性校验
 
 ## 5. 项目架构图
-![系统架构](https://xxx.png "在这里输入图片标题")
+![系统架构](https://cdn.fanguwan.com/github/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE-%E7%A7%92%E6%9D%80.png "架构图")
 
 ## 6. 技术栈
 - SpringCloud Hoxton.SR8
