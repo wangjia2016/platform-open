@@ -12,6 +12,7 @@
 - 秒杀的特点、难点如下
   瞬时流量
   防止库存超卖
+- 流量预估
   
 ## 3.秒杀架构演变
 - 单机环境下早期采用数据库的悲观锁 for update进行控制 or ReentrantLock synchronized
