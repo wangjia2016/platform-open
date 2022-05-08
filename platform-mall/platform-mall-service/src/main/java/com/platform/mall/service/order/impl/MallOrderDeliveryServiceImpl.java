@@ -1,17 +1,11 @@
 package com.platform.mall.service.order.impl;
 
 import org.springframework.stereotype.Service;
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import com.platform.mall.dao.order.mapper.MallOrderDeliveryMapper;
 import com.platform.mall.dao.order.entity.MallOrderDelivery;
 import com.platform.mall.service.order.MallOrderDeliveryService;
-import com.platform.mall.dao.order.model.list.MallOrderDeliveryListDto;
 import com.platform.mall.dao.order.model.detail.MallOrderDeliveryDetailDto;
 import com.platform.mall.dao.order.model.query.MallOrderDeliveryQuery;
 import com.platform.mall.dao.order.convert.MallOrderDeliveryConverter;

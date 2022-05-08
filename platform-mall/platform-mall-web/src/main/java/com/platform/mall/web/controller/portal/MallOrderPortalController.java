@@ -5,7 +5,6 @@ import com.platform.common.auth.CheckAuthentication;
 import com.platform.common.result.Result;
 import com.platform.common.util.UUIDUtils;
 import com.platform.mall.dao.order.convert.MallOrderConverter;
-import com.platform.mall.dao.order.entity.MallOrder;
 import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.service.order.MallOrderService;
@@ -15,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;

@@ -50,10 +50,6 @@ public class MallOrderPayPortalController {
      */
     @PostMapping("/notifyOrderProcess")
     public Result notifyOrderProcess(@RequestBody WxPayOrderNotifyResult wxPayOrderNotifyResult) {
-        //try{  入口放商城这边 处理完毕 调用微信接口 回复微信？处理验签问题 处理成功 调用微信失败？补偿？
-        //      入口放微信服务那边，验签成功，调用商城服务？ 成功，回复微信 处理参数问题？失败，重试？
-        //  微信自带重试机制
-
         log.info("wxPayOrderNotifyResult,{}0",wxPayOrderNotifyResult.toString());
         final Boolean aBoolean = mallOrderPayService.notifyOrderProcess(wxPayOrderNotifyResult);
         if(aBoolean){

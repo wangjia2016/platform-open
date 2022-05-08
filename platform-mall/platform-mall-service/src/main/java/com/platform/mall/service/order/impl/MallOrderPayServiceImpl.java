@@ -60,7 +60,6 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
             //校验失败
             return result;
         }
-
         //支付中
         mallOrder.setPayStatus(2);
         mallOrderMapper.updateById(mallOrder);
@@ -75,7 +74,6 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
 
     @Override
     public Boolean notifyOrderProcess(WxPayOrderNotifyResult wxPayOrderNotifyResult) {
-
         // TODO 防止微信重复调用
         final MallOrder mallOrder = mallOrderMapper.selectOne(new QueryWrapper<MallOrder>().lambda()
                 .in(MallOrder::getOrderNo, wxPayOrderNotifyResult.getOutTradeNo()));

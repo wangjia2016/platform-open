@@ -63,6 +63,9 @@ import com.platform.mall.dao.order.convert.MallOrderConverter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+/**
+ * @author Administrator
+ */
 @Slf4j
 @Service("mallOrderService")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -102,23 +105,19 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
     @Override
     public MallOrderDetailDto orderDetail(Long id) {
-
         MallOrder mallOrder = mallOrderMapper.selectById(id);
         //查询订单项
         List<MallOrderItem> mallOrderItems = mallOrderItemMapper.selectList(new QueryWrapper<MallOrderItem>().lambda()
                 .in(MallOrderItem::getOrderId, id));
-
         MallOrderDetailDto orderDetail = MallOrderConverter.INSTANCE.toDTO(mallOrder);
         List<MallOrderItemListDto> mallOrderItemListDtos = MallOrderItemConverter.INSTANCE.toListDTO(mallOrderItems);
         orderDetail.setListMallOrderItem(mallOrderItemListDtos);
-
         return orderDetail;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean createOrder(MallOrderRequestQuery mallOrderFlashRequestQuery) {
-
         Long orderNo = snowFlakeIdGenerator.nextId();
         final Long orderId = mallOrderFlashRequestQuery.getOrderId();
 
@@ -137,7 +136,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 .number(number)
                 .distributorId(mallOrderFlashRequestQuery.getDistributorId())
                 .tenantId(mallOrderFlashRequestQuery.getTenantId()).build();
-        MallGoodsDetailDto mallGoodsDetailDto = mallGoodsCacheManager.getMallGoods(goodsId);
         mallOrderItemMapper.insert(mallOrderItem);
         //更新库存
         mallGoodsMapper.updateGoodsStock(goodsId,number);
@@ -158,16 +156,15 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         mallOrder.setBusinessType(2);
         final int insert = mallOrderMapper.insert(mallOrder);
         //发送延时消息到MQ
-        //设置重试次数 rocketMQTemplate.getProducer().setRetryTimesWhenSendFailed();
         //destination:tag1||tag2 延时等级 1s 5s 10s 15s 20s 25s 30s 1m 5m 10m 15m 20m 30m 45m 1h 2h 23h 1d 2d 7d
         // 秒杀订单 10分钟未支付 直接取消
         SendResult sendResult = rocketMQTemplate.syncSend("cancel-normal-mall-order:cancelNormalOrderTag",
                 MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),5000,10);
         log.info("cancel-normal-mall-order 延时消息发送:",sendResult.toString());
         //发送支付提醒消息到MQ 提前一个小时提醒
-//        SendResult payResult = rocketMQTemplate.syncSend("normal-mall-order-to-pay:cancelNormalOrderTag",
-//                MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),5000,17);
-//        log.info("normal-mall-order-to-pay 待支付提醒消息发送:",payResult.toString());
+        SendResult payResult = rocketMQTemplate.syncSend("mall-order-to-pay-notify:orderToPayNotifyTag",
+                MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),5000,17);
+        log.info("normal-mall-order-to-pay 待支付提醒消息发送:",payResult.toString());
         if(insert>0){
             return true;
         }
@@ -255,7 +252,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
     @Override
     @Async("consumerQueueThreadPool")
     public void asyncMsgProcess(MallOrder mallOrder) {
-
         final List<MallOrderItemListDto> mallOrderItemListDtos = mallOrderItemService.listMallOrderItem(MallOrderItemQuery.builder()
                 .orderNo(mallOrder.getOrderNo()).build());
         if(CollectionUtils.isEmpty(mallOrderItemListDtos)){
@@ -304,11 +300,9 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             },consumerQueueThreadPool);
 
             CompletableFuture.allOf(normalStockFuture).get();
-
             Long orderId = snowFlakeIdGenerator.nextId();
             //发送消息到MQ 這裡購物車裡面應該是發送一條消息，不應該是多條消息
             mallOrderFlashRequestQuery.setOrderId(orderId);
-
             SendResult sendResult = rocketMQTemplate.syncSend("create-flash-mall-order:createFlashOrderTag",
                     MessageBuilder.withPayload(JsonUtil.object2Json(mallOrderFlashRequestQuery)).setHeader(RocketMQHeaders.KEYS, orderId).build());
             log.info(sendResult.toString());
@@ -347,41 +341,6 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         // 预扣减库存
         return this.preReduceStock(mallOrderRequestQuery);
     }
-
-    /**
-     * 校验秒杀场次信息
-     *
-     */
-//    private void checkFlashSession(MallOrderRequestQuery mallOrderFlashRequestQuery) {
-//        final MallFlashSessionsDetailDto mallFlashSessionsDetail = mallFlashPromotionCacheManager.getMallFlashSessionsDetail(mallOrderFlashRequestQuery.getSessionsId());
-//        if (mallFlashSessionsDetail==null){
-//            log.info("秒杀场次不存在或已过期,下单失败");
-//            throw new BusinessException("秒杀场次不存在或已过期,下单失败");
-//        }
-//        if (mallFlashSessionsDetail.getIsEnable()==1){
-//            // 场次未启用
-//            log.info("秒杀场次未启用,下单失败");
-//            throw new BusinessException("秒杀场次未启用,下单失败");
-//        }
-//
-//        if (mallFlashSessionsDetail.getBuyLimit()<mallOrderFlashRequestQuery.getNumber()){
-//            // 场次限购  TODO 还需要校验之前购买的数量
-//            log.info("秒杀购买数量超过限制,{}",mallFlashSessionsDetail.getBuyLimit());
-//            throw new BusinessException("秒杀购买数量超过限制,{}",mallFlashSessionsDetail.getBuyLimit());
-//        }
-//        Date now = new Date();
-//        if (mallFlashSessionsDetail.getStartTime().getTime()>now.getTime()){
-//            // 场次未启用
-//            log.info("秒杀时间未开始,下单失败");
-//            throw new BusinessException("秒杀时间未开始,下单失败");
-//        }
-//
-//        if (mallFlashSessionsDetail.getEndTime().getTime()<now.getTime()){
-//            // 场次未启用
-//            log.info("秒杀时间已结束,下单失败");
-//            throw new BusinessException("秒杀时间已结束,下单失败");
-//        }
-//    }
 
     /**
      * 商品合法性校验
