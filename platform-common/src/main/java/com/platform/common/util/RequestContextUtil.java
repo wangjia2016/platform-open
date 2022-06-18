@@ -1,8 +1,10 @@
 package com.platform.common.util;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -49,6 +51,15 @@ public class RequestContextUtil implements ApplicationContextAware {
     @SuppressWarnings("unchecked")
     public static <T> T getBean(String name) {
         return (T) applicationContext.getBean(name);
+    }
+
+    /*
+     * 手动注册bean
+     */
+    public  void registerSingletonBean(String beanName, Object singletonObject) {
+        ConfigurableApplicationContext configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
+        DefaultListableBeanFactory defaultListableBeanFactory = (DefaultListableBeanFactory) configurableApplicationContext.getAutowireCapableBeanFactory();
+        defaultListableBeanFactory.registerSingleton(beanName, singletonObject);
     }
 
 }
