@@ -4,9 +4,11 @@
 - 关于SpirngCloud、SpringCloudAlibaba、SpringBoot 三者的版本依赖关系 参见SpringCloud官方文档
 - 本项目可以作为微服务架构，整合了nacos、rocketmq、sentinal、feign、redis、redisson、jjwt、mybatis等常见微服务组件
 - 网关采用Spring Cloud Gateway 是另外一个单独的项目 
-- 本项目以商城秒杀下单为例，使用Redission分布式锁控制库存扣减，RocketMq进行异步、削峰处理
+- 本项目以商城秒杀下单为例，使用Redission分布式锁控制库存扣减，RocketMq进行异步、削峰处理、以及用事务消息实现分布式事务等
+- 基于Redis的幂等性方案
 - 全局统一异常处理
 - 秒杀&优惠券&微信支付&商品配置&订单
+- 设计模式：工厂模式、策略模式、模板方法、状态机模式等
 
 ## 2.秒杀介绍
 - 秒杀的难点
