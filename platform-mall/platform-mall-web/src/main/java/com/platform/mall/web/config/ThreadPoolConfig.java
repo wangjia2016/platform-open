@@ -13,6 +13,7 @@ import java.util.concurrent.*;
  * 线程池 -SpringBoot
  * */
 //@Configuration
+    @Deprecated
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ThreadPoolConfig {
 
