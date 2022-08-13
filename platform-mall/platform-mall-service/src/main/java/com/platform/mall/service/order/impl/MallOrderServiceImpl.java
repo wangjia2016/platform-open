@@ -1,14 +1,13 @@
 package com.platform.mall.service.order.impl;
 
 import com.platform.common.enums.MallCacheKey;
-import com.platform.common.enums.OnUnSaleEnum;
+import com.platform.common.enums.OrderStatusEnum;
 import com.platform.common.exception.BusinessException;
 import com.platform.common.result.Result;
 import com.platform.common.util.DateTimeUtil;
 import com.platform.common.util.JsonUtil;
 import com.platform.common.util.SnowFlakeIdGenerator;
 import com.platform.common.util.UUIDUtils;
-import com.platform.mall.dao.basic.MallGoodsConstant;
 import com.platform.mall.dao.basic.MallOrderStatusConstant;
 import com.platform.mall.dao.basic.NotifyManagerDto;
 import com.platform.mall.dao.goods.convert.MallGoodsConverter;
@@ -34,7 +33,6 @@ import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.rocketmq.spring.support.RocketMQHeaders;
 import org.redisson.api.RLock;
-import org.redisson.api.RSemaphore;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -42,9 +40,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -370,6 +365,11 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             throw new BusinessException("商品合法性校验-商品{},库存不足,下单失败",mallGoods.getName());
         }
         return mallGoods;
+    }
+
+    @Override
+    public Boolean changOrderState(Long orderId, OrderStatusEnum beforeStatus, OrderStatusEnum afterStatus) {
+        return mallOrderMapper.changOrderState(orderId,beforeStatus,afterStatus);
     }
 
 }

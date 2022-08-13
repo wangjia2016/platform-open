@@ -60,4 +60,11 @@
         original,is_delete,create_time,update_datetime,
         tenant_id
     </sql>
+
+    <!-- 订单状态流转 -->
+    <update id="changOrderState" >
+        UPDATE mall_order
+        SET order_status = #{afterStatus}
+        WHERE id = #{orderId} AND state = #{beforeStatus}
+    </update>
 </mapper>

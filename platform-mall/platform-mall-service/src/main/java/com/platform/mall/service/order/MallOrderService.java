@@ -1,16 +1,12 @@
 package com.platform.mall.service.order;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
+import com.platform.common.enums.OrderStatusEnum;
 import com.platform.common.result.Result;
 import com.platform.mall.dao.order.entity.MallOrder;
-import com.platform.mall.dao.order.model.list.MallOrderListDto;
 import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
 import com.platform.mall.dao.order.model.query.*;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 /**
  * MallOrder业务处理
@@ -84,5 +80,16 @@ public interface MallOrderService extends IService<MallOrder> {
 
 
     Boolean preCreateOrder(MallOrderRequestQuery mallOrderRequest);
+
+    /**
+     * 订单状态流转
+     * @param orderId
+     * @param beforeStatus 流转之前的状态
+     * @param afterStatus  流转之后的状态
+     * @return Boolean
+     * @author wangjia
+     * @date 2022.02.26 21:31
+     **/
+    Boolean changOrderState(Long orderId, OrderStatusEnum beforeStatus, OrderStatusEnum afterStatus);
 }
 
