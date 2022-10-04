@@ -102,12 +102,6 @@
 ## 14.许可协议
 
 ## 15.功能截图
-- 秒杀活动配置
-![秒杀活动配置](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%801.png "秒杀活动配置")
-- 秒杀商品配置
-![秒杀商品配置](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%95%86%E5%93%811.png "秒杀商品配置")
-- 秒杀场次配置
-![秒杀场次配置](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%95%86%E5%93%811.png "秒杀场次配置")
 
 - 前端效果
 ![前端效果](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%89%8D%E7%AB%AF.png "前端效果-秒杀商品列表")
