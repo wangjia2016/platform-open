@@ -1,6 +1,5 @@
 package com.platform.mall.service.threadpool.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.platform.common.result.CommonParam;
 import com.platform.mall.dao.threadpool.convert.ThreadPoolConfigConverter;

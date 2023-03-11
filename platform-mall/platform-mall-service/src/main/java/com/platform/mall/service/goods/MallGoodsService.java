@@ -1,7 +1,6 @@
 package com.platform.mall.service.goods;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import com.platform.mall.dao.goods.entity.MallGoods;
 import com.platform.mall.dao.goods.model.list.MallGoodsListDto;
