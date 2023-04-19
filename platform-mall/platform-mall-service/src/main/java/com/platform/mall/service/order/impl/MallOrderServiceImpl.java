@@ -43,8 +43,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -310,6 +312,57 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             throw new BusinessException(e.getMessage());
         }finally {
             rLock.unlock();
+        }
+        return false;
+    }
+
+    /***
+     * 乐观锁实现扣减库存
+     * @param mallOrderFlashRequestQuery
+     * @return
+     */
+    public Boolean preReduceStockAtomic(MallOrderRequestQuery mallOrderFlashRequestQuery) {
+        mallOrderFlashRequestQuery.setTenantId(mallOrderFlashRequestQuery.getTenantId());
+        Long goodsId = mallOrderFlashRequestQuery.getGoodsId();
+
+        Integer num = mallOrderFlashRequestQuery.getNumber();
+        final MallGoodsDetailDto mallGoods = mallGoodsCacheManager.getMallGoods(goodsId);
+
+        Integer stock = mallGoods.getStock();
+        AtomicInteger stockNum = new AtomicInteger(stock);
+        stock = stockNum.get();
+        // 首先不能超出普通商品库存
+        if (stock <= 0 || num > stock) {
+            log.info("秒杀-当前商品库存不足,goodsId={},stock={}", goodsId, stock);
+            throw new BusinessException("秒杀-预扣减库存-商品{},库存不足,下单失败", mallGoods.getName());
+        }
+
+        int update = stock - num;
+        if (stockNum.compareAndSet(stock, update)) { // 秒杀成功
+            //更新缓存里面的库存数
+            mallGoods.setStock(update);
+            CompletableFuture<Void> normalStockFuture = CompletableFuture.runAsync(()->{
+                // 普通商品库存减 num
+                redisTemplate.opsForValue().set(MallCacheKey.NORMAL_GOODS_PREFIX.getTypeValue() + goodsId, MallGoodsConverter.INSTANCE.fromDTO(mallGoods), 7200, TimeUnit.SECONDS);
+            },consumerQueueThreadPool);
+
+            try {
+                CompletableFuture.allOf(normalStockFuture).get();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            Long orderId = snowFlakeIdGenerator.nextId();
+            //发送消息到MQ 這裡購物車裡面應該是發送一條消息，不應該是多條消息
+            mallOrderFlashRequestQuery.setOrderId(orderId);
+            SendResult sendResult = rocketMQTemplate.syncSend("create-flash-mall-order:createFlashOrderTag",
+                    MessageBuilder.withPayload(JsonUtil.object2Json(mallOrderFlashRequestQuery)).setHeader(RocketMQHeaders.KEYS, orderId).build());
+            log.info(sendResult.toString());
+            //发送成功
+            if (sendResult.getSendStatus().equals(SendStatus.SEND_OK)) {
+                return true;
+            }
         }
         return false;
     }
