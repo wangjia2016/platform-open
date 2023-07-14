@@ -25,7 +25,7 @@
   - 如何压测？
   
 ## 3.秒杀架构演变
-- V1.0 单机环境下早期采用数据库的悲观锁 for update进行控制 or ReentrantLock synchronized
+- V1.0 单机环境下早期采用数据库的悲观锁 for update、乐观锁等进行控制 or ReentrantLock synchronized
 - V2.0 分布式环境下 采用分布式锁进行控制库存扣减
 - V3.0 微服务高并发环境下，采用redis+mq 多级缓存、异步、削峰
 
