@@ -31,20 +31,14 @@ public class CancelOrdeMqListener implements RocketMQListener<String> , RocketMQ
 
         MallOrder mallOrder = mallOrderService.getById(Long.parseLong(message));
         //要实现消息幂等性处理
-        if (mallOrder != null) {
-            log.info("message:{},处理次数",message);
-            if (MallOrderStatusConstant.TO_PAY.getTypeValue().equals(mallOrder.getOrderStatus())){
-                //待支付 -取消
-                mallOrderService.cancelOrder(Long.parseLong(message),"超时取消");
-            }
+        if (mallOrder != null && MallOrderStatusConstant.TO_PAY.getTypeValue().equals(mallOrder.getOrderStatus())) {
+            mallOrderService.cancelOrder(mallOrder.getId(), null, "超时取消");
         }
     }
 
     @Override
     public void prepareStart(DefaultMQPushConsumer consumer) {
-        //每次拉取间隔，单位毫秒
-        consumer.setPullInterval(2000);
-        //每次从队列中拉取的消息数
-        consumer.setPullBatchSize(100);
+        consumer.setPullInterval(0);
+        consumer.setPullBatchSize(32);
     }
 }

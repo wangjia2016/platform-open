@@ -64,7 +64,7 @@
     <!-- 订单状态流转 -->
     <update id="changOrderState" >
         UPDATE mall_order
-        SET order_status = #{afterStatus}
-        WHERE id = #{orderId} AND state = #{beforeStatus}
+        SET order_status = #{afterStatus.typeValue}
+        WHERE id = #{orderId} AND order_status = #{beforeStatus.typeValue}
     </update>
 </mapper>

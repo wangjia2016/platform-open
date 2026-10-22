@@ -1,6 +1,7 @@
 package com.platform.mall.service.order.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.platform.common.result.Result;
 import com.platform.common.util.DateTimeUtil;
 import com.platform.mall.dao.basic.MallOrderStatusConstant;
@@ -41,13 +42,13 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
     private final MallOrderService mallOrderService;
 
     @Override
-    public Result orderPay(MallOrderPayPortalRequest mallOrderPayPortalRequest) {
+    public Result orderPay(MallOrderPayPortalRequest mallOrderPayPortalRequest, Long memberId) {
 
         final MallOrder mallOrder = mallOrderMapper.selectById(mallOrderPayPortalRequest.getOrderId());
 
-        if(mallOrder==null){
+        if (mallOrder == null || memberId == null || !memberId.equals(mallOrder.getMemberId())) {
             log.error("订单不存在或已删除,请检查");
-            return  Result.fail("订单不存在或已删除,请检查");
+            return Result.fail("订单不存在或已删除,请检查");
         }
 
         if(!MallOrderStatusConstant.TO_PAY.getTypeValue().equals(mallOrder.getOrderStatus())){
@@ -74,17 +75,38 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
 
     @Override
     public Boolean notifyOrderProcess(WxPayOrderNotifyResult wxPayOrderNotifyResult) {
-        // TODO 防止微信重复调用
+        Long orderNo;
+        try {
+            orderNo = Long.valueOf(wxPayOrderNotifyResult.getOutTradeNo());
+        } catch (NumberFormatException ex) {
+            log.error("支付回调订单号非法,outTradeNo={}", wxPayOrderNotifyResult.getOutTradeNo());
+            return false;
+        }
         final MallOrder mallOrder = mallOrderMapper.selectOne(new QueryWrapper<MallOrder>().lambda()
-                .in(MallOrder::getOrderNo, wxPayOrderNotifyResult.getOutTradeNo()));
-
-        //1、更改订单状态 设置待收货 待核销？
+                .eq(MallOrder::getOrderNo, orderNo));
+        if (mallOrder == null) {
+            log.error("支付回调订单不存在,outTradeNo={}", wxPayOrderNotifyResult.getOutTradeNo());
+            return false;
+        }
+        if (!MallOrderStatusConstant.TO_PAY.getTypeValue().equals(mallOrder.getOrderStatus())) {
+            log.info("支付回调重复或状态已变化,orderNo={},status={}", mallOrder.getOrderNo(), mallOrder.getOrderStatus());
+            return true;
+        }
         mallOrder.setOrderStatus(MallOrderStatusConstant.TO_RECEIVE.getTypeValue());
         mallOrder.setTransactionId(wxPayOrderNotifyResult.getTransactionId());
-        mallOrder.setPayTime(DateTimeUtil.parseDate(wxPayOrderNotifyResult.getTimeEnd(),"yyyyMMddHHmmss"));
+        mallOrder.setPayTime(DateTimeUtil.parseDate(wxPayOrderNotifyResult.getTimeEnd(), "yyyyMMddHHmmss"));
         mallOrder.setPayStatus(0);
-        mallOrderMapper.updateById(mallOrder);
-        //2、 发送消息通知管理员
+        int rows = mallOrderMapper.update(null, new UpdateWrapper<MallOrder>()
+                .eq("id", mallOrder.getId())
+                .eq("order_status", MallOrderStatusConstant.TO_PAY.getTypeValue())
+                .set("order_status", mallOrder.getOrderStatus())
+                .set("transaction_id", mallOrder.getTransactionId())
+                .set("pay_time", mallOrder.getPayTime())
+                .set("pay_status", mallOrder.getPayStatus()));
+        if (rows == 0) {
+            log.info("支付回调并发重复,orderNo={}", mallOrder.getOrderNo());
+            return true;
+        }
         mallOrderService.asyncMsgProcess(mallOrder);
         return true;
     }

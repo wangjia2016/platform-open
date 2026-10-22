@@ -1,10 +1,11 @@
 package com.platform.mall.web.controller.portal;
 
+import com.platform.common.auth.CheckAuthentication;
 import com.platform.common.result.Result;
 import com.platform.mall.dao.order.model.list.WxPayOrderNotifyResult;
 import com.platform.mall.dao.order.model.query.MallOrderPayPortalRequest;
 import com.platform.mall.service.order.MallOrderPayService;
-import com.platform.mall.service.order.MallOrderService;
+import com.platform.mall.web.support.CurrentMember;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,9 @@ public class MallOrderPayPortalController {
      **/
     @ApiOperation("订单支付")
     @PostMapping("/orderPay")
+    @CheckAuthentication
     public Result orderPay(@RequestBody MallOrderPayPortalRequest mallOrderPayPortalRequest) {
-        return mallOrderPayService.orderPay(mallOrderPayPortalRequest);
+        return mallOrderPayService.orderPay(mallOrderPayPortalRequest, CurrentMember.requireId());
     }
 
     /**

@@ -14,7 +14,7 @@ public interface MallOrderPayService {
     /**
      * 发起支付
      * */
-    Result orderPay(MallOrderPayPortalRequest mallOrderPayPortalRequest);
+    Result orderPay(MallOrderPayPortalRequest mallOrderPayPortalRequest, Long memberId);
 
     /**
      * 支付之后处理

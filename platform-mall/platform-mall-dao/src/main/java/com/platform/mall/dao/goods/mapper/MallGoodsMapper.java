@@ -4,6 +4,7 @@ import com.platform.mall.dao.goods.entity.MallGoods;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.platform.mall.dao.goods.model.detail.MallGoodsDetailDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 商品表
@@ -33,7 +34,7 @@ public interface MallGoodsMapper extends BaseMapper<MallGoods> {
      * @Author: 王佳
      * @date 2020年10月6日
      */
-     Integer updateGoodsStock(Long id,Integer number);
+     Integer updateGoodsStock(@Param("id") Long id, @Param("number") Integer number);
 
     /**
      * @Description: 取消订单-返回库存
@@ -44,6 +45,6 @@ public interface MallGoodsMapper extends BaseMapper<MallGoods> {
      * @Author: 王佳
      * @date 2020年11月8日
      */
-     Integer updateGoodStockBack(Long id);
+     Integer updateGoodStockBack(@Param("orderNo") Long orderNo);
 }
 

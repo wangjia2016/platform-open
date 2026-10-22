@@ -72,3 +72,8 @@ redisson:
   database: ${REDIS_DATABASE:9}
   timeout: 5000
   connectionPoolSize: 100
+
+mall:
+  order:
+    # 下单接口默认 QPS，Sentinel 未接控制台时仍生效
+    create-qps: 2000

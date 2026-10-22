@@ -4,6 +4,7 @@ import com.platform.common.enums.OrderStatusEnum;
 import com.platform.mall.dao.order.entity.MallOrder;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 
@@ -24,5 +25,5 @@ public interface MallOrderMapper extends BaseMapper<MallOrder> {
      * @author wangjia
      * @date 2022.02.26 21:31
      **/
-    Boolean changOrderState(Long orderId, OrderStatusEnum beforeStatus, OrderStatusEnum afterStatus);
+    Boolean changOrderState(@Param("orderId") Long orderId, @Param("beforeStatus") OrderStatusEnum beforeStatus, @Param("afterStatus") OrderStatusEnum afterStatus);
 }

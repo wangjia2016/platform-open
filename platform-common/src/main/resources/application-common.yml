@@ -12,7 +12,7 @@ feign:
     config:
       # 想要调用的微服务的名称 default表示全局
       default:
-        loggerLevel: full
+        loggerLevel: basic
         requestInterceptors:
           - com.platform.common.interceptor.TokenRequestIntecepor
   httpclient:

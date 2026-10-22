@@ -90,7 +90,6 @@ public class RedisCacheCofig  extends CachingConfigurerSupport {
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
 
         RedisSerializationContext.SerializationPair<Object> pair = RedisSerializationContext.SerializationPair
@@ -111,9 +110,6 @@ public class RedisCacheCofig  extends CachingConfigurerSupport {
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        //非final类型的属性
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-
         jackson2JsonRedisSerializer.setObjectMapper(om);
         // 设置value的序列化规则和 key的序列化规则
         template.setKeySerializer(template.getStringSerializer());

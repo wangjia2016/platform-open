@@ -33,7 +33,7 @@ public interface MallOrderService extends IService<MallOrder> {
      * @Author wangjia
      * @Date 2020-10-02 17:06:55
      **/
-    MallOrderDetailDto orderDetail(Long id);
+    MallOrderDetailDto orderDetail(Long id, Long memberId);
 
     /**
      * @Description 普通-提交订单
@@ -71,7 +71,7 @@ public interface MallOrderService extends IService<MallOrder> {
      * @Author wangjia
      * @Date 2020-11-8 11:30:55
      **/
-    Result cancelOrder(Long id, String reason);
+    Result cancelOrder(Long id, Long memberId, String reason);
 
     /**
      * 异步发送微信模板消息处理
