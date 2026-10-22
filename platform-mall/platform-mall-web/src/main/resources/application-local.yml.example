@@ -1,0 +1,18 @@
+# Rename/copy to application-local.yml and activate with:
+#   --spring.profiles.include=common,local
+# application-local.yml is gitignored — put real passwords only there if you prefer not to use env vars.
+
+spring:
+  datasource:
+    hikari:
+      username: root
+      password: your-local-mysql-password
+
+redis:
+  password: your-local-redis-password
+
+redisson:
+  password: your-local-redis-password
+
+secret: your-local-jwt-secret
+expire-time-in-second: 1209600

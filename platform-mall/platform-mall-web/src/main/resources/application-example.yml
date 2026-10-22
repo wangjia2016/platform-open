@@ -1,0 +1,30 @@
+# Example / reference only. Tracked configs already use ${ENV:default} placeholders.
+# For local overrides with real secrets: copy to application-local.yml (gitignored)
+# and run with --spring.profiles.include=common,local  (or set spring.profiles.include).
+
+spring:
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/mall-open?serverTimezone=Asia/Shanghai}
+    hikari:
+      username: ${MYSQL_USERNAME:root}
+      password: ${MYSQL_PASSWORD:change-me}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:localhost:8848}
+  profiles:
+    include: common
+
+redis:
+  host: ${REDIS_HOST:localhost}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  database: ${REDIS_DATABASE:9}
+
+redisson:
+  address: ${REDISSON_ADDRESS:redis://localhost:6379}
+  password: ${REDIS_PASSWORD:}
+  database: ${REDIS_DATABASE:9}
+
+# See also root .env.example and platform-common application-common.yml for JWT_SECRET.

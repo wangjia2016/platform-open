@@ -23,10 +23,15 @@ feign:
     # feign单个路径的最大连接数 最优参数需要结合压测调整
     max-connections-per-route: 50
 
+# Prefer env JWT_SECRET / JWT_EXPIRE_SECONDS (see .env.example). Do not commit real secrets.
 jwt:
-  secret: 371620923838562304831ff6f46941461f8a1fa5090b0223d5
+  secret: ${JWT_SECRET:change-me-use-a-long-random-string}
   # 有效期，单位秒，默认2周
-  expire-time-in-second: 1209600
+  expire-time-in-second: ${JWT_EXPIRE_SECONDS:1209600}
+
+# JwtOperator reads top-level ${secret} / ${expire-time-in-second} (not jwt.*). Keep in sync.
+secret: ${JWT_SECRET:change-me-use-a-long-random-string}
+expire-time-in-second: ${JWT_EXPIRE_SECONDS:1209600}
 
 mybatis-plus:
   mapper-locations: classpath*:com/platform/**/dao/**/*.xml

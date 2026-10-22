@@ -41,4 +41,10 @@ target/
 *.project
 *.settings
 *.classpath
-#*/src/main/resources/application-*.yml
+
+### Local secrets / overrides (do not commit) ###
+.env
+.env.local
+.env.*.local
+**/application-local.yml
+**/application-local.yaml

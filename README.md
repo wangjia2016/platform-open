@@ -119,8 +119,11 @@
 
 ## 13.部署说明
   先导入数据库脚本
-  修改 application.yml 里面的 mysql、redis、nacos、rocketmq 链接地址
-  启动相应的组件
+  敏感配置已改为环境变量占位（见根目录 `.env.example`），请勿把真实密码提交进仓库
+  - 常用变量：`MYSQL_PASSWORD`、`REDIS_PASSWORD`、`JWT_SECRET`（以及可选的 `MYSQL_URL`、`NACOS_ADDR`、`ROCKETMQ_NAME_SERVER`）
+  - 本地也可复制 `application-local.yml.example` → `application-local.yml`（已 gitignore），用 `--spring.profiles.include=common,local` 覆盖
+  - 参考：`platform-mall/.../application-example.yml`
+  启动相应的组件（MySQL / Redis / Nacos / RocketMQ）
 
 ## 14.许可协议
 本项目采用 [Apache License 2.0](./LICENSE) 开源协议。
