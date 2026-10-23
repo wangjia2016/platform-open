@@ -26,8 +26,11 @@
             <artifactId>platform-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!-- DTO/ApiModel annotations in dao; Swagger UI config in web -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+        </dependency>
     </dependencies>
-
-
 
 </project>
