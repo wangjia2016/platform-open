@@ -163,4 +163,36 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
                 .eq(MallFlashSessionsGoods::getSessionsId, sessionsId)
                 .eq(MallFlashSessionsGoods::getGoodsId, goodsId)) > 0;
     }
+
+    @Override
+    public void validateSessionForOrder(Long sessionsId, Long goodsId) {
+        if (sessionsId == null) {
+            throw new BusinessException("下单必要参数[sessionsId]不能为空,下单失败");
+        }
+        if (goodsId == null) {
+            throw new BusinessException("秒杀下单必要参数[goodsId]为空,下单失败");
+        }
+        MallFlashSessions session = mallFlashSessionsMapper.selectById(sessionsId);
+        if (session == null) {
+            throw new BusinessException("秒杀场次不存在,下单失败");
+        }
+        if (session.getIsEnable() == null || session.getIsEnable() != 1) {
+            throw new BusinessException("秒杀场次未启用,下单失败");
+        }
+        int status = FlashSessionStatus.resolve(session.getStartTime(), session.getEndTime(), new Date());
+        if (status == FlashSessionStatus.NOT_STARTED) {
+            throw new BusinessException("秒杀场次未开始,下单失败");
+        }
+        if (status == FlashSessionStatus.ENDED) {
+            throw new BusinessException("秒杀场次已结束,下单失败");
+        }
+        MallFlashSessionsGoods relation = mallFlashSessionsGoodsMapper.selectOne(
+                new QueryWrapper<MallFlashSessionsGoods>().lambda()
+                        .eq(MallFlashSessionsGoods::getSessionsId, sessionsId)
+                        .eq(MallFlashSessionsGoods::getGoodsId, goodsId));
+        if (relation == null) {
+            throw new BusinessException("商品未绑定该秒杀场次,下单失败");
+        }
+    }
+
 }

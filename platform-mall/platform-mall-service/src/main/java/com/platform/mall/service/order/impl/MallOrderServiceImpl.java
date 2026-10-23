@@ -34,6 +34,7 @@ import com.platform.mall.dao.order.model.query.MallOrderQuery;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.manager.cache.MallGoodsCacheManager;
+import com.platform.mall.service.flash.MallFlashSessionsService;
 import com.platform.mall.service.order.MallOrderDeliveryService;
 import com.platform.mall.service.order.MallOrderItemService;
 import com.platform.mall.service.order.MallOrderMq;
@@ -83,6 +84,8 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
     private final MallGoodsCacheManager mallGoodsCacheManager;
 
     private final GoodsStockCache goodsStockCache;
+
+    private final MallFlashSessionsService mallFlashSessionsService;
 
     @Override
     public MallOrderDetailDto getOne(MallOrderQuery mallOrderQuery) {
@@ -351,6 +354,9 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
     public Boolean preCreateOrder(MallOrderRequestQuery mallOrderRequestQuery) {
         this.checkOrderParam(mallOrderRequestQuery);
         this.checkGoodsValidator(mallOrderRequestQuery);
+        mallFlashSessionsService.validateSessionForOrder(
+                mallOrderRequestQuery.getSessionsId(),
+                mallOrderRequestQuery.getGoodsId());
         return this.preReduceStock(mallOrderRequestQuery);
     }
 

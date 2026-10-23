@@ -27,4 +27,11 @@ public interface MallFlashSessionsService extends IService<MallFlashSessions> {
     MallFlashSessionsGoods bindGoods(MallFlashSessionsGoodsBindQuery bindQuery);
 
     boolean unbindGoods(Long sessionsId, Long goodsId);
+
+    /**
+     * 下单前校验：场次存在且启用、处于进行中、商品已绑定该场次。
+     * 不通过时抛 BusinessException，须在预扣库存 / 发 MQ 之前调用。
+     */
+    void validateSessionForOrder(Long sessionsId, Long goodsId);
 }
+
