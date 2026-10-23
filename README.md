@@ -96,10 +96,10 @@
 
 ## 9. 业务功能模块
 - 秒杀业务
-  - 秒杀场次列表 - 待实现
-  - 秒杀活动，一个活动包含秒杀起止时间、活动名称等 
-  - 秒杀场次，一个场次包含多个秒杀商品 - 待实现
-  - 秒杀商品，一个秒杀商品可以被多个秒杀场次关联
+  - 秒杀场次列表（门户 `GET /api/flash/sessions/list`）
+  - 秒杀活动，一个活动包含秒杀起止时间、活动名称等（表 `mall_flash_promotion`）
+  - 秒杀场次，一个场次包含多个秒杀商品（门户 `GET /api/flash/sessions/goods`；管理端绑定 `POST /admin/flash/sessions/bindGoods`）
+  - 秒杀商品，一个秒杀商品可以被多个秒杀场次关联（表 `mall_flash_sessions_goods`）
 - 支付
 - 通知
   - 待支付提醒

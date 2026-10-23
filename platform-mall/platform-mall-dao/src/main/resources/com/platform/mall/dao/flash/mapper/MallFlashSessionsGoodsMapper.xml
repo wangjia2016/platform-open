@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.platform.mall.dao.flash.mapper.MallFlashSessionsGoodsMapper">
+
+    <select id="listGoodsBySessionsId"
+            resultType="com.platform.mall.dao.flash.model.list.MallFlashSessionsGoodsListDto">
+        SELECT
+            sg.id,
+            sg.sessions_id AS sessionsId,
+            sg.goods_id AS goodsId,
+            sg.flash_price AS flashPrice,
+            sg.flash_stock AS flashStock,
+            sg.list_order AS listOrder,
+            g.name AS goodsName,
+            g.title AS goodsTitle,
+            g.logo AS goodsLogo,
+            g.price AS originalPrice,
+            g.stock AS goodsStock,
+            g.on_un_sale AS onUnSale
+        FROM mall_flash_sessions_goods sg
+        INNER JOIN mall_goods g ON g.id = sg.goods_id AND g.is_delete = 0
+        WHERE sg.sessions_id = #{sessionsId}
+          AND sg.is_delete = 0
+        ORDER BY sg.list_order ASC, sg.id ASC
+    </select>
+
+</mapper>

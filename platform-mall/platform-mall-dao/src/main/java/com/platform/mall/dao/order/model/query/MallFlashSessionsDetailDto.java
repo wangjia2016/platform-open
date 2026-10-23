@@ -13,8 +13,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 限时抢购场次-全局DetailDto
+ * 限时抢购场次-全局DetailDto（历史桩）。
+ * 请改用 {@link com.platform.mall.dao.flash.model.detail.MallFlashSessionsDetailDto}。
  *
+ * @deprecated 保留兼容；新代码使用 flash 包下的场次模型
  * @author wangjia
  * @email vivianshine@126.com
  * @date 2021-03-08 13:56:21
@@ -24,6 +26,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Deprecated
 public class MallFlashSessionsDetailDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
