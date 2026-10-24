@@ -14,5 +14,6 @@ redis:
 redisson:
   password: your-local-redis-password
 
-secret: your-local-jwt-secret
-expire-time-in-second: 1209600
+jwt:
+  secret: your-local-jwt-secret
+  expire-time-in-second: 1209600
