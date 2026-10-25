@@ -1,5 +1,7 @@
 本项目持续完善中... 具体技术详解与业务设计，参见 WIKI。
 
+**社区与安全：** [贡献指南](CONTRIBUTING.md) · [安全披露](SECURITY.md) · License: Apache-2.0
+
 ## 1.项目说明
 - 本项目基于 Spring Boot 2.3.4、Spring Cloud Hoxton.SR8、Spring Cloud Alibaba 2.2.3.RELEASE（版本以根目录 `pom.xml` 为准，并非跟踪各组件最新发行版）
 - 关于 Spring Cloud、Spring Cloud Alibaba、Spring Boot 三者的版本依赖关系，参见 Spring Cloud 官方文档
