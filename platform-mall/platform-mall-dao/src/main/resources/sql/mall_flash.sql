@@ -1,8 +1,13 @@
 /*
   Flash-sale promotion / session / session-goods schema.
   Aligns with README §9: activity -> sessions -> multi goods (goods may belong to many sessions).
-*/
 
+  Suggested import order (same directory):
+    1) mall_flash.sql          -- schema (this file)
+    2) thread_pool_config.sql  -- schema + seed for order/goods pools
+    3) mall_flash_seed.sql     -- demo promotion/session (needs mall_goods id=1 or edit @demo_goods_id)
+    4) mall_cart.sql           -- cart (legacy dump; optional for flash path)
+*/
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

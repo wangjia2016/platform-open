@@ -122,7 +122,11 @@
     使用 JMeter 进行压测
 
 ## 13.部署说明
-  先导入数据库脚本
+  先导入数据库脚本（目录 `platform-mall/platform-mall-dao/src/main/resources/sql/`）：
+  1. `mall_flash.sql` — 秒杀活动 / 场次 / 场次商品表结构
+  2. `thread_pool_config.sql` — 线程池配置表 + `order_pool` / `goods_pool` 种子
+  3. `mall_flash_seed.sql` — 演示用进行中的秒杀场次（默认绑定 `mall_goods.id = 1`，可改脚本里的 `@demo_goods_id`）
+  4. `mall_cart.sql` — 购物车等（可选；完整商城还需自备 `mall_goods` 等业务表数据）
   敏感配置已改为环境变量占位（见根目录 `.env.example`），请勿把真实密码提交进仓库
   - 常用变量：`MYSQL_PASSWORD`、`REDIS_PASSWORD`、`JWT_SECRET`（以及可选的 `MYSQL_URL`、`NACOS_ADDR`、`ROCKETMQ_NAME_SERVER`）
   - 本地也可复制 `application-local.yml.example` → `application-local.yml`（已 gitignore），用 `--spring.profiles.include=common,local` 覆盖
