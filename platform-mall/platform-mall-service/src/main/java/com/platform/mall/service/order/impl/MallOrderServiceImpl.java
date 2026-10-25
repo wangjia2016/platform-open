@@ -10,7 +10,6 @@ import com.platform.common.result.Result;
 import com.platform.common.util.DateTimeUtil;
 import com.platform.common.util.JsonUtil;
 import com.platform.common.util.SnowFlakeIdGenerator;
-import com.platform.common.util.UUIDUtils;
 import com.platform.mall.dao.basic.MallOrderStatusConstant;
 import com.platform.mall.dao.basic.NotifyManagerDto;
 import com.platform.mall.dao.goods.mapper.MallGoodsMapper;
@@ -306,9 +305,12 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 .address(address)
                 .remark(DateTimeUtil.format(mallOrder.getPayTime(), "yyyy-MM-dd HH:mm:ss"))
                 .openid("").build();
-        SendResult sendResult = rocketMQTemplate.syncSend("order-pay-success-notify-mamager:orderPayManagerNotify",
-                MessageBuilder.withPayload(build).setHeader(RocketMQHeaders.KEYS, UUIDUtils.getUUID32()).build(), 5000);
-        log.info("order-pay-success-notify-mamager 消息发送:{}", sendResult.getSendStatus());
+        // KEYS 用订单号，便于消费端按单去重；仅在支付回调首次落库成功后调用本方法
+        SendResult sendResult = rocketMQTemplate.syncSend(MallOrderMq.PAY_SUCCESS_DESTINATION,
+                MessageBuilder.withPayload(build)
+                        .setHeader(RocketMQHeaders.KEYS, String.valueOf(mallOrder.getOrderNo()))
+                        .build(), 5000);
+        log.info("{} 消息发送:{}", MallOrderMq.PAY_SUCCESS_DESTINATION, sendResult.getSendStatus());
     }
 
     @Override

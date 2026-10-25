@@ -92,7 +92,7 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
             log.info("支付回调重复或状态已变化,orderNo={},status={}", mallOrder.getOrderNo(), mallOrder.getOrderStatus());
             return true;
         }
-        mallOrder.setOrderStatus(MallOrderStatusConstant.TO_RECEIVE.getTypeValue());
+        mallOrder.setOrderStatus(MallOrderStatusConstant.TO_DELIVERY.getTypeValue());
         mallOrder.setTransactionId(wxPayOrderNotifyResult.getTransactionId());
         mallOrder.setPayTime(DateTimeUtil.parseDate(wxPayOrderNotifyResult.getTimeEnd(), "yyyyMMddHHmmss"));
         mallOrder.setPayStatus(0);

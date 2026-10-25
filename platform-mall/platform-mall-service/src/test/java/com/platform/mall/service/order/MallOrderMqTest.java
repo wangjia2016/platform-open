@@ -2,9 +2,16 @@ package com.platform.mall.service.order;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MallOrderMqTest {
+
+    @Test
+    void paySuccessDestinationKeepsLegacyTopicSpelling() {
+        assertEquals("order-pay-success-notify-mamager:orderPayManagerNotify",
+                MallOrderMq.PAY_SUCCESS_DESTINATION);
+    }
 
     @Test
     void payReminderFiresBeforeUnpaidCancel() {

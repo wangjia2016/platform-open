@@ -14,6 +14,13 @@ public final class MallOrderMq {
     public static final String CANCEL_DESTINATION = "cancel-normal-mall-order:cancelNormalOrderTag";
     public static final String PAY_REMIND_DESTINATION = "mall-order-to-pay-notify:orderToPayNotifyTag";
 
+    /**
+     * 支付成功通知运营侧。topic/tag 历史拼写 mamager 保持不变，避免破坏已有订阅。
+     */
+    public static final String PAY_SUCCESS_TOPIC = "order-pay-success-notify-mamager";
+    public static final String PAY_SUCCESS_TAG = "orderPayManagerNotify";
+    public static final String PAY_SUCCESS_DESTINATION = PAY_SUCCESS_TOPIC + ":" + PAY_SUCCESS_TAG;
+
     /** 默认等级 9 = 5 分钟，早于关单。 */
     public static final int PAY_REMIND_DELAY_LEVEL = 9;
     /** 默认等级 14 = 10 分钟。 */
