@@ -9,7 +9,7 @@
 - 关于 Spring Cloud、Spring Cloud Alibaba、Spring Boot 三者的版本依赖关系，参见 Spring Cloud 官方文档
 - 本项目可作为微服务学习/脚手架参考，整合了 Nacos、RocketMQ、Sentinel、Feign、Redis、Redisson、JJWT、MyBatis 等常见组件
 - 网关采用 Spring Cloud Gateway，为另外一个单独的项目（不在本仓库）
-- 以商城秒杀下单为例：使用 Redisson 分布式锁控制库存扣减，RocketMQ 做异步、削峰，以及事务消息等
+- 以商城秒杀下单为例：可售库存用 Redis Lua 原子扣减（`GoodsStockCache`），RocketMQ 异步下单/削峰；Redisson 仍作分布式锁基础设施（解锁请走 `RedissonLocks.safeUnlock`）
 - 基于 Redis 的幂等性方案
 - 全局统一异常处理
 - 业务：秒杀、优惠券、微信支付、商品配置、订单
@@ -50,9 +50,9 @@
   - 如何压测？
   
 ## 3.秒杀架构演变
-- V1.0 单机环境下早期采用数据库的悲观锁 for update、乐观锁等进行控制 or ReentrantLock synchronized
-- V2.0 分布式环境下 采用分布式锁进行控制库存扣减
-- V3.0 微服务高并发环境下，采用 redis+mq 多级缓存、异步、削峰
+- V1.0 单机：数据库悲观锁 / 乐观锁，或 `ReentrantLock` / `synchronized`
+- V2.0 分布式：曾用 Redisson 分布式锁控库存（易在租约过期后误 unlock，已弃用该路径）
+- V3.0（当前）：Redis Lua 预扣可售库存 + RocketMQ 异步落单，多级缓存与削峰
 
 ## 4.秒杀解决方案  
 - 业务尽可能简单，能取缓存就从缓存取（可以是多级缓存），减轻 mysql 的压力
