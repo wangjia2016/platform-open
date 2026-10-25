@@ -48,3 +48,7 @@ target/
 .env.*.local
 **/application-local.yml
 **/application-local.yaml
+
+### macOS ###
+.DS_Store
+**/.DS_Store
