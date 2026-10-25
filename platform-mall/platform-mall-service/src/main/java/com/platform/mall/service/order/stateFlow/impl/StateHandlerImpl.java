@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class StateHandlerImpl extends StateConfig implements IStateHandler {
 
-    StateHandlerImpl(){
+    public StateHandlerImpl(){
         log.info("loading...");
     }
     @Override

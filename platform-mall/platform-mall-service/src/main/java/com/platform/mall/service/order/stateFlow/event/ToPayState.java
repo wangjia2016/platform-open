@@ -20,7 +20,7 @@ public class ToPayState extends AbstractState {
 
     @Override
     public Result toDelivery(Long orderId, OrderStatusEnum currentStatus) {
-        final boolean update = mallOrderService.changOrderState(orderId,currentStatus,OrderStatusEnum.TRADE_CLOSED);
+        final boolean update = mallOrderService.changOrderState(orderId,currentStatus,OrderStatusEnum.TO_DELIVERY);
         return update ? Result.success("订单支付完成") : Result.fail("订单状态变更失败");
     }
 
