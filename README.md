@@ -132,6 +132,9 @@
   - 本地也可复制 `application-local.yml.example` → `application-local.yml`（已 gitignore），用 `--spring.profiles.include=common,local` 覆盖
   - 参考：`platform-mall/.../application-example.yml`
   启动相应的组件（MySQL / Redis / Nacos / RocketMQ）
+  - 一键本地依赖：`docker compose up -d`（见根目录 `docker-compose.yml`）
+  - 步骤说明：[QUICKSTART.md](./QUICKSTART.md)
+
 
 ## 14.许可协议
 本项目采用 [Apache License 2.0](./LICENSE) 开源协议。
