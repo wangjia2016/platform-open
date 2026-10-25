@@ -21,9 +21,9 @@
 | Java | 1.8 |
 | MyBatis-Plus | 3.4.0 |
 | rocketmq-spring-boot-starter | 2.0.3 |
-| Redisson | 3.8.2 |
+| Redisson | 3.17.7 |
 | JJWT | 0.10.7 |
-| Guava | 30.0-jre |
+| Guava | 32.1.3-jre |
 | springfox (Swagger) | 3.0.0 |
 | MapStruct | 1.3.1.Final |
 | Lombok | 1.18.8 |
