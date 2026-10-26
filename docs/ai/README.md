@@ -6,10 +6,15 @@
 
 | 阶段 | 状态 |
 | --- | --- |
-| **第一期（当前）** | 仅文档与提示词资产，**无可调用 AI HTTP 接口**，Java 依赖中**未**引入模型 SDK |
-| **第二期（计划）** | 按本文档落地独立 AI 服务 + mall 侧 Feign 调用（搜索计划 / 推荐 / 分析等） |
+| **第一期** | Agent / Skills / 提示词文档资产 |
+| **第二期（已落地）** | 独立模块 `platform-ai` + mall Feign；默认规则降级，配置 `AI_ENABLED`+`AI_API_KEY` 后走 OpenAI 兼容接口 |
 
 不要把本目录理解成「已经上线智能推荐引擎」。
+
+
+## 怎么用（第二期）
+
+见根目录 [QUICKSTART.md](../../QUICKSTART.md) §5：起 `platform-ai`（8088），再调 `/ai/v1/*` 或经 mall `/mall/api/ai/v1/*`。默认无密钥走规则降级。
 
 ## 怎么用（第一期）
 

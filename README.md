@@ -20,7 +20,7 @@
 
 - **第一期（文档）：** [docs/ai/README.md](docs/ai/README.md) — Agent / Skills / 提示词
 - **架构与是否独立服务：** [docs/ai/ARCHITECTURE.md](docs/ai/ARCHITECTURE.md) — 结论为仓内独立模块 `platform-ai`，mall Feign 调用；秒杀主链路不经过 AI
-- **第二期：** 按该文档 §8 落地可调用 API（默认关闭，可降级）
+- **第二期（已落地）：** 模块 `platform-ai`（8088）+ 门面 `/mall/api/ai/v1/*`；默认规则降级，`AI_ENABLED`+`AI_API_KEY` 后走模型
 
 ## 1. 项目说明
 

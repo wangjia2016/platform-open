@@ -18,6 +18,7 @@
         <module>platform-mall</module>
         <module>platform-common</module>
         <module>platform-starter</module>
+        <module>platform-ai</module>
     </modules>
 
     <properties>

@@ -77,3 +77,9 @@ mall:
   order:
     # 下单接口默认 QPS，Sentinel 未接控制台时仍生效
     create-qps: 2000
+
+# Optional AI assistant (platform-ai). Gateway is on by default; LLM inside AI service stays off until AI_ENABLED + AI_API_KEY.
+platform:
+  ai:
+    base-url: ${AI_SERVICE_URL:http://127.0.0.1:8088}
+    gateway-enabled: ${AI_GATEWAY_ENABLED:true}

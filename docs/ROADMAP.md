@@ -28,7 +28,7 @@
 ## AI（商城）
 
 - [x] 第一期：`docs/ai` 架构定稿（独立 `platform-ai` + Feign）+ Agents/Skills/prompts
-- [ ] 第二期：按 [ai/ARCHITECTURE.md](./ai/ARCHITECTURE.md) §8 **全部落地**（search-plan / recommend / analyze / session-plan、降级、mall 门面、配置与 curl）
+- [x] 第二期：按 [ai/ARCHITECTURE.md](./ai/ARCHITECTURE.md) §8 **全部落地**（search-plan / recommend / analyze / session-plan、降级、mall 门面、配置与 curl）
 - [ ] 更晚：ES/向量检索、行为推荐、AI 写回运营动作（默认仍不进支付/库存主链路）
 
 反馈请开 Issue；安全问题走 [SECURITY.md](../SECURITY.md)。

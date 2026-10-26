@@ -53,14 +53,33 @@ App default: `http://localhost:8080/mall`
 - Tables: see `platform-mall/.../sql/` and README §13
 - Seed session is **relative to import time** (`mall_flash_seed.sql`) and binds `goods_id = 1` by default (schema creates `mall_goods`; insert a real goods row before placing orders)
 
-## 5. Stop
+## 5. Optional: platform-ai
+
+```bash
+# terminal A — AI service (port 8088). No API key => rule fallback (degraded=true)
+mvn -pl platform-ai -am -DskipTests package
+java -jar platform-ai/target/platform-ai-*.jar
+
+# smoke (direct)
+curl -sS http://127.0.0.1:8088/ai/v1/health
+curl -sS -X POST http://127.0.0.1:8088/ai/v1/goods/search-plan \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"300元内降噪耳机"}'
+
+# via mall facade (app must be up): /mall/api/ai/v1/...
+curl -sS http://127.0.0.1:8080/mall/api/ai/v1/health
+```
+
+Set `AI_ENABLED=true` and `AI_API_KEY` only when you want real OpenAI-compatible calls. Flash order / pay paths never call AI.
+
+## 6. Stop
 
 ```bash
 docker compose down
 ```
 
 
-## 6. Smoke check (curl)
+## 7. Smoke check (curl)
 
 App context-path is `/mall`. Flash portal APIs **do not require login** (see `MallFlashPortalController`).
 

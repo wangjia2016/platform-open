@@ -1,0 +1,23 @@
+server:
+  port: ${AI_SERVER_PORT:8088}
+
+spring:
+  application:
+    name: platform-ai
+  cloud:
+    nacos:
+      discovery:
+        server-addr: ${NACOS_ADDR:127.0.0.1:8848}
+        enabled: ${NACOS_DISCOVERY_ENABLED:false}
+
+platform:
+  ai:
+    enabled: ${AI_ENABLED:false}
+    api-key: ${AI_API_KEY:}
+    base-url: ${AI_BASE_URL:https://api.openai.com/v1}
+    model: ${AI_MODEL:gpt-4o-mini}
+    timeout-ms: ${AI_TIMEOUT_MS:8000}
+
+logging:
+  level:
+    com.platform.ai: INFO
