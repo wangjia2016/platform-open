@@ -9,16 +9,20 @@
 | `platform-common` 公共组件（JWT、Redisson 安全解锁、异常等） | 独立 Gateway 工程 |
 | `platform-mall` 商城/秒杀示例（web / service / dao / manager） | 完整前台 App（README 截图为示意稿） |
 | `platform-starter` 启动相关脚手架能力 | Elasticsearch 等周边能力未必齐备 |
+| `platform-ai` 可选 AI 辅助（默认规则降级） | 完整推荐中台 / 行为协同过滤 |
 | `docker-compose` 本地 MySQL / Redis / Nacos / RocketMQ | 生产级多机部署与压测环境 |
 
 版本钉在根 `pom.xml`（当前 Boot 2.3.4 / Cloud Hoxton.SR12 / Alibaba 2.2.9），**不是**跟踪各组件最新发行版。
 
 ## 模块依赖（简图）
 
+完整配图见 [../screenshots/architecture.jpg](./screenshots/architecture.jpg)；下图为可渲染源：
+
 ```mermaid
 flowchart TB
   subgraph apps [应用层]
     WEB[platform-mall-web]
+    AI[platform-ai 可选]
   end
   subgraph mall [platform-mall]
     SVC[platform-mall-service]
@@ -30,12 +34,15 @@ flowchart TB
 
   WEB --> SVC
   WEB --> MGR
+  WEB -.->|Feign 非秒杀主链路| AI
   SVC --> DAO
   SVC --> MGR
   MGR --> COMMON
   WEB --> COMMON
+  AI --> COMMON
   MGR --> INFRA
   DAO --> INFRA
+  AI --> INFRA
 ```
 
 ## 秒杀主链路（当前实现）

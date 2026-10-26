@@ -98,18 +98,53 @@
 
 ## 5. 项目架构图
 
-原 CDN 外链图已失效。当前以仓库内 Mermaid 为准（GitHub 可直接渲染）：
+原 CDN 外链图已失效；下方为按当前代码重绘的架构图（含可选 `platform-ai`，秒杀主链路不经过 AI）。
 
-- 模块依赖与秒杀时序：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+![platform-open 架构图](docs/screenshots/architecture.jpg "platform-open 架构")
+
+更细的模块依赖与秒杀时序见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。GitHub 也可直接渲染下方 Mermaid：
 
 ```mermaid
-flowchart LR
-  Client --> Web[mall-web]
-  Web --> Lua[Redis Lua 库存]
-  Web --> MQ[RocketMQ]
-  MQ --> DB[(MySQL)]
-  Web --> Redis[(Redis / Redisson)]
-  Web --> Nacos[Nacos]
+flowchart TB
+  Client[Client / C端]
+  GW["Gateway（不在本仓）"]
+  WEB[platform-mall-web]
+
+  subgraph mall [platform-mall]
+    SVC[platform-mall-service]
+    MGR[platform-mall-manager]
+    DAO[platform-mall-dao]
+  end
+
+  subgraph flash [秒杀主链路 V3]
+    LUA[GoodsStockCache Redis Lua]
+    MQ[RocketMQ 异步落单]
+    DB[(MySQL 订单/状态机)]
+  end
+
+  subgraph ai [可选 AI]
+    AI[platform-ai :8088]
+  end
+
+  COMMON[platform-common]
+  INFRA[(Nacos / Redis / RocketMQ / MySQL)]
+
+  Client --> WEB
+  Client -.-> GW
+  WEB --> SVC
+  WEB --> MGR
+  SVC --> DAO
+  SVC --> MGR
+  WEB -->|Lua 预扣| LUA
+  WEB --> MQ
+  MQ --> DB
+  WEB -.->|Feign /mall/api/ai/v1| AI
+  WEB --> COMMON
+  MGR --> COMMON
+  AI --> COMMON
+  MGR --> INFRA
+  DAO --> INFRA
+  AI --> INFRA
 ```
 
 ## 6. 技术栈

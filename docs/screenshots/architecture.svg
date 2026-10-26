@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="720" viewBox="0 0 1120 720">
+  <defs>
+    <style>
+      .title { font: 700 22px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #0f172a; }
+      .sub { font: 400 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #64748b; }
+      .h { font: 600 13px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #0f172a; }
+      .t { font: 400 12px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #334155; }
+      .s { font: 400 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #64748b; }
+      .lab { font: 600 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #475569; }
+    </style>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#059669"/>
+    </marker>
+    <marker id="arrowDash" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L6,3 L0,6 Z" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <rect width="1120" height="720" fill="#f8fafc"/>
+  <text x="40" y="42" class="title">platform-open 架构（学习脚手架）</text>
+  <text x="40" y="64" class="sub">Boot 2.3.4 · Cloud Hoxton.SR12 · Alibaba 2.2.9 · 秒杀主链路不经 AI</text>
+
+  <!-- Client -->
+  <rect x="470" y="88" width="180" height="48" rx="10" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+  <text x="560" y="110" text-anchor="middle" class="h">Client / C 端</text>
+  <text x="560" y="126" text-anchor="middle" class="s">HTTP · /mall context</text>
+
+  <line x1="560" y1="136" x2="560" y2="168" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Gateway note -->
+  <rect x="700" y="88" width="220" height="48" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5 4"/>
+  <text x="810" y="110" text-anchor="middle" class="h">Gateway（不在本仓）</text>
+  <text x="810" y="126" text-anchor="middle" class="s">独立工程 · 仅规划</text>
+
+  <!-- mall-web -->
+  <rect x="360" y="168" width="400" height="70" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="1.8"/>
+  <text x="560" y="196" text-anchor="middle" class="h">platform-mall-web</text>
+  <text x="560" y="216" text-anchor="middle" class="t">Portal / Admin · Feign · Sentinel · JWT</text>
+
+  <!-- arrows from web -->
+  <line x1="420" y1="238" x2="250" y2="290" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="560" y1="238" x2="560" y2="290" stroke="#059669" stroke-width="2" marker-end="url(#arrowGreen)"/>
+  <line x1="700" y1="238" x2="870" y2="290" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrowDash)"/>
+
+  <text x="300" y="268" class="lab">领域</text>
+  <text x="575" y="268" class="lab" fill="#059669">秒杀主链路</text>
+  <text x="780" y="268" class="lab" fill="#7c3aed">可选 AI 门面</text>
+
+  <!-- left: service stack -->
+  <rect x="40" y="290" width="280" height="220" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="180" y="316" text-anchor="middle" class="h">platform-mall</text>
+  <rect x="60" y="332" width="240" height="36" rx="8" fill="#eff6ff" stroke="#3b82f6"/>
+  <text x="180" y="354" text-anchor="middle" class="t">platform-mall-service</text>
+  <rect x="60" y="378" width="240" height="36" rx="8" fill="#eff6ff" stroke="#3b82f6"/>
+  <text x="180" y="400" text-anchor="middle" class="t">platform-mall-manager</text>
+  <rect x="60" y="424" width="240" height="36" rx="8" fill="#eff6ff" stroke="#3b82f6"/>
+  <text x="180" y="446" text-anchor="middle" class="t">platform-mall-dao</text>
+  <text x="180" y="486" text-anchor="middle" class="s">订单状态机 · MQ 消费 · MyBatis</text>
+
+  <!-- center: flash path -->
+  <rect x="360" y="290" width="400" height="220" rx="12" fill="#ecfdf5" stroke="#059669" stroke-width="1.8"/>
+  <text x="560" y="316" text-anchor="middle" class="h">秒杀主链路（当前 V3）</text>
+  <rect x="380" y="336" width="160" height="56" rx="8" fill="#ffffff" stroke="#10b981"/>
+  <text x="460" y="358" text-anchor="middle" class="t">GoodsStockCache</text>
+  <text x="460" y="376" text-anchor="middle" class="s">Redis Lua 预扣</text>
+  <rect x="560" y="336" width="180" height="56" rx="8" fill="#ffffff" stroke="#10b981"/>
+  <text x="650" y="358" text-anchor="middle" class="t">RocketMQ</text>
+  <text x="650" y="376" text-anchor="middle" class="s">异步落单 / 削峰</text>
+  <rect x="380" y="410" width="360" height="70" rx="8" fill="#ffffff" stroke="#10b981"/>
+  <text x="560" y="438" text-anchor="middle" class="t">MySQL · 订单状态机 · 支付回调幂等</text>
+  <text x="560" y="458" text-anchor="middle" class="s">不经过 platform-ai · Redisson 仅作锁基建</text>
+
+  <!-- right: AI -->
+  <rect x="800" y="290" width="280" height="220" rx="12" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.8"/>
+  <text x="940" y="316" text-anchor="middle" class="h">platform-ai（可选）</text>
+  <text x="940" y="336" text-anchor="middle" class="s">端口 8088 · 默认规则降级</text>
+  <rect x="820" y="352" width="240" height="36" rx="8" fill="#ffffff" stroke="#8b5cf6"/>
+  <text x="940" y="374" text-anchor="middle" class="t">/ai/v1/health</text>
+  <rect x="820" y="398" width="240" height="36" rx="8" fill="#ffffff" stroke="#8b5cf6"/>
+  <text x="940" y="420" text-anchor="middle" class="t">search / recommend / analyze</text>
+  <rect x="820" y="444" width="240" height="36" rx="8" fill="#ffffff" stroke="#8b5cf6"/>
+  <text x="940" y="466" text-anchor="middle" class="t">flash session-plan</text>
+  <text x="940" y="496" text-anchor="middle" class="s">AI_ENABLED + API_KEY → LLM</text>
+
+  <!-- common -->
+  <rect x="40" y="540" width="280" height="56" rx="10" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="180" y="564" text-anchor="middle" class="h">platform-common</text>
+  <text x="180" y="582" text-anchor="middle" class="s">JWT · Result · AI DTO · RedissonLocks</text>
+
+  <!-- infra -->
+  <rect x="360" y="540" width="720" height="56" rx="10" fill="#f8fafc" stroke="#475569" stroke-width="1.5"/>
+  <text x="720" y="564" text-anchor="middle" class="h">基础设施（docker-compose）</text>
+  <text x="720" y="582" text-anchor="middle" class="t">Nacos · Redis / Redisson · RocketMQ · MySQL</text>
+
+  <!-- bottom notes -->
+  <text x="40" y="640" class="s">Feign：mall-web → platform-ai（/mall/api/ai/v1/* 门面）· Nacos 发现默认可关</text>
+  <text x="40" y="660" class="s">学习脚手架：非生产完整商城；Gateway 仓外独立；ES/行为推荐为后续 Roadmap</text>
+  <text x="40" y="690" class="lab">图例：</text>
+  <rect x="90" y="678" width="14" height="14" fill="#ecfdf5" stroke="#059669"/>
+  <text x="110" y="690" class="s">秒杀主链路</text>
+  <rect x="210" y="678" width="14" height="14" fill="#f5f3ff" stroke="#7c3aed"/>
+  <text x="230" y="690" class="s">可选 AI（虚线）</text>
+  <rect x="360" y="678" width="14" height="14" fill="#f1f5f9" stroke="#94a3b8"/>
+  <text x="380" y="690" class="s">不在本仓</text>
+</svg>
