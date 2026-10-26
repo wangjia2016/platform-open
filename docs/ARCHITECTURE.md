@@ -16,7 +16,7 @@
 
 ## 模块依赖（简图）
 
-完整配图见 [../screenshots/architecture.jpg](./screenshots/architecture.jpg)；下图为可渲染源：
+完整配图见 [../screenshots/architecture.svg](./screenshots/architecture.svg)；下图为可渲染源：
 
 ```mermaid
 flowchart TB

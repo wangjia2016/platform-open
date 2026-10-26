@@ -100,7 +100,7 @@
 
 原 CDN 外链图已失效；下方为按当前代码重绘的架构图（含可选 `platform-ai`，秒杀主链路不经过 AI）。
 
-![platform-open 架构图](docs/screenshots/architecture.jpg "platform-open 架构")
+![platform-open 架构图](docs/screenshots/architecture.svg "platform-open 架构")
 
 更细的模块依赖与秒杀时序见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。GitHub 也可直接渲染下方 Mermaid：
 
