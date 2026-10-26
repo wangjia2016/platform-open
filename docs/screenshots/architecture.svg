@@ -21,7 +21,7 @@
   </defs>
 
   <rect width="1120" height="720" fill="#f8fafc"/>
-  <text x="40" y="42" class="title">platform-open 架构（学习脚手架）</text>
+  <text x="40" y="42" class="title">platform-open 架构</text>
   <text x="40" y="64" class="sub">Boot 2.3.4 · Cloud Hoxton.SR12 · Alibaba 2.2.9 · 秒杀主链路不经 AI</text>
 
   <!-- Client -->
@@ -98,7 +98,7 @@
 
   <!-- bottom notes -->
   <text x="40" y="640" class="s">Feign：mall-web → platform-ai（/mall/api/ai/v1/* 门面）· Nacos 发现默认可关</text>
-  <text x="40" y="660" class="s">学习脚手架：非生产完整商城；Gateway 仓外独立；ES/行为推荐为后续 Roadmap</text>
+  <text x="40" y="660" class="s">生产实践开源整理；Gateway 仓外独立；ES/行为推荐见 Roadmap</text>
   <text x="40" y="690" class="lab">图例：</text>
   <rect x="90" y="678" width="14" height="14" fill="#ecfdf5" stroke="#059669"/>
   <text x="110" y="690" class="s">秒杀主链路</text>

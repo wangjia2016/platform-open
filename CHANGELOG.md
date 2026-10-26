@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- 文档：弱化「学习脚手架」表述，README/About 改为生产实践开源整理定位
 - 文档：重绘 README 项目架构图（`docs/screenshots/architecture.svg` + Mermaid），补上 platform-ai
 - AI：第二期落地 `platform-ai`（规则降级 + 可选 OpenAI 兼容）与 mall 门面 `/mall/api/ai/v1/*`；第一期 docs/ai 资产保留
 - 文档：学习路径、架构模块图（Mermaid）、公开 Roadmap；README 改为脚手架/学习定位

@@ -1,18 +1,18 @@
 # platform-open
 
-**Spring Cloud Alibaba 微服务学习脚手架**（商城秒杀示例）。适合想把 Nacos / Redis / RocketMQ / Feign / Redisson 等串成一条可运行业务链路的同学；不是「生产级完整商城」，也不是跟踪最新 Boot/Cloud 的发行版。
+**基于 Spring Cloud Alibaba 的微服务实践工程**（商城 / 秒杀）。核心链路（库存防超卖、MQ 削峰、支付幂等、订单状态机等）来自已上线业务的沉淀与开源整理；本仓面向可运行、可阅读的完整示例，版本钉在 Boot 2.3 / Hoxton，不追逐最新发行版。
 
 **社区与安全：** [贡献指南](CONTRIBUTING.md) · [安全披露](SECURITY.md) · [学习路径](docs/LEARNING_PATH.md) · [架构说明](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · License: Apache-2.0
 
 [![CI](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml/badge.svg)](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE) [![Java](https://img.shields.io/badge/Java-8-orange.svg)](./pom.xml) [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.3.4-brightgreen.svg)](./pom.xml)
 
-## 适合谁 / 不适合谁
+## 适合谁 / 边界说明
 
-| 适合 | 不太适合 |
+| 适合 | 本仓刻意不做 / 不在本仓 |
 | --- | --- |
-| 用真实业务（秒杀）理解微服务组件怎么配合 | 要开箱即用的完整 C 端 App / 独立 Gateway 仓 |
-| 学习库存防超卖、MQ 削峰、支付幂等、订单状态机 | 要直接上生产的多机高可用方案 |
-| 按 [学习路径](docs/LEARNING_PATH.md) 读代码 + 本地 docker-compose 跑通 | 要 Boot 3 / 最新 Alibaba 的版本追随 |
+| 对照真实秒杀链路做二次开发或研读（Lua 库存、MQ 削峰、支付幂等、状态机） | 完整 C 端 App、独立 Gateway 工程（Gateway 另仓） |
+| 本地 `docker-compose` 一键拉起依赖并跑通 [QUICKSTART](./QUICKSTART.md) | 多机生产部署手册、压测环境一键交付 |
+| 按 [学习路径](docs/LEARNING_PATH.md) / [架构说明](docs/ARCHITECTURE.md) 深入模块 | Boot 3 / 最新 Alibaba 版本追随 |
 
 **5 分钟上手：** 见 [QUICKSTART.md](./QUICKSTART.md)（`docker compose up -d` → 启动 `platform-mall-web`）。
 
@@ -59,7 +59,7 @@
 | `platform-mall-service` | 领域服务、状态机、MQ 消费等 |
 | `platform-mall-manager` | 缓存与外部资源封装（含 `GoodsStockCache`） |
 | `platform-mall-dao` | MyBatis 实体 / Mapper / SQL |
-| `platform-starter` | 启动侧脚手架能力 |
+| `platform-starter` | 启动与基础装配 |
 
 更细的依赖关系与秒杀时序见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 

@@ -1,6 +1,6 @@
 # 架构与模块地图
 
-面向把本仓库当 **Spring Cloud Alibaba 学习脚手架** 的读者：先看清边界，再顺着秒杀主链路读代码。
+面向研读或二次开发本仓的读者：先看清边界，再顺着秒杀主链路读代码。核心实现来自生产实践的开源整理。
 
 ## 仓库边界（诚实说明）
 
@@ -8,7 +8,7 @@
 | --- | --- |
 | `platform-common` 公共组件（JWT、Redisson 安全解锁、异常等） | 独立 Gateway 工程 |
 | `platform-mall` 商城/秒杀示例（web / service / dao / manager） | 完整前台 App（README 截图为示意稿） |
-| `platform-starter` 启动相关脚手架能力 | Elasticsearch 等周边能力未必齐备 |
+| `platform-starter` 启动与基础装配 | Elasticsearch 等周边能力未必齐备 |
 | `platform-ai` 可选 AI 辅助（默认规则降级） | 完整推荐中台 / 行为协同过滤 |
 | `docker-compose` 本地 MySQL / Redis / Nacos / RocketMQ | 生产级多机部署与压测环境 |
 
