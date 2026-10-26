@@ -1,0 +1,23 @@
+{
+  "request": {
+    "goods": {
+      "id": 1,
+      "name": "降噪耳机 X",
+      "title": "副标题待优化",
+      "price": 99,
+      "proposedPrice": 120,
+      "stock": 3,
+      "stockWarn": 10,
+      "onUnSale": 0
+    }
+  },
+  "response_rules_fallback": {
+    "degraded": true,
+    "strategy": "rules",
+    "risks": ["stockWarn: 当前库存 3 低于预警 10", "pricing: 建议价高于现价，需确认毛利与转化"],
+    "copyDrafts": {
+      "title": "降噪耳机 X",
+      "sellingPoints": "低库存紧俏 · 适合秒杀场次测款"
+    }
+  }
+}

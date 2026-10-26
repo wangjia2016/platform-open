@@ -1,0 +1,21 @@
+{
+  "request": {
+    "anchorGoodsId": 1,
+    "limit": 3,
+    "candidates": [
+      {"id": 1, "name": "锚点降噪耳机", "price": 299, "stock": 20, "onUnSale": 0},
+      {"id": 2, "name": "同价位耳机 Pro", "price": 319, "stock": 50, "onUnSale": 0},
+      {"id": 3, "name": "已下架款", "price": 199, "stock": 0, "onUnSale": 1},
+      {"id": 4, "name": "入门款耳机", "price": 159, "stock": 80, "onUnSale": 0}
+    ]
+  },
+  "response_rules_fallback": {
+    "degraded": true,
+    "strategy": "rules",
+    "items": [
+      {"goodsId": 2, "score": 0.85, "reason": "在售且库存充足，价格接近锚点"},
+      {"goodsId": 4, "score": 0.72, "reason": "在售候选"}
+    ],
+    "note": "锚点自身与 onUnSale=1 不会进入推荐列表（见 RuleAiService.recommend）"
+  }
+}

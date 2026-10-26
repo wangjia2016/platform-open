@@ -20,7 +20,7 @@
 
 1. 读 [ARCHITECTURE.md](./ARCHITECTURE.md) 了解为何做成独立服务、模块边界与第二期接口契约  
 2. 按场景打开 `skills/` 或 `prompts/`，在 Cursor / 其它 Agent 中加载  
-3. 用 `examples/sample-goods.json` 做无密钥演练  
+3. 用 `examples/` 下样例演练：`sample-goods.json`、`search-plan-sample.json`、`recommend-request-response.json`、`analyze-request-response.json`  
 4. 角色约束见 `agents/`
 
 ## 目录

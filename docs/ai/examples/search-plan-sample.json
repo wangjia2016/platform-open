@@ -1,0 +1,10 @@
+{
+  "request": {"query": "300元内降噪耳机"},
+  "response_rules_fallback": {
+    "degraded": true,
+    "strategy": "rules",
+    "keywords": ["降噪", "耳机"],
+    "pseudoSql": "SELECT * FROM mall_goods WHERE name LIKE '%降噪%' AND name LIKE '%耳机%' AND price <= 300",
+    "filters": [{"field": "price", "op": "<=", "value": 300}]
+  }
+}

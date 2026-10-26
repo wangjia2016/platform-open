@@ -6,6 +6,41 @@
 
 [![CI](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml/badge.svg)](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE) [![Java](https://img.shields.io/badge/Java-8-orange.svg)](./pom.xml) [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.3.4-brightgreen.svg)](./pom.xml)
 
+
+## 30 秒演示（curl）
+
+依赖已 `docker compose up -d` 且 `platform-mall-web` 已启动（详见 [QUICKSTART.md](./QUICKSTART.md)）。
+
+```bash
+# 1) 秒杀场次列表
+curl -sS "http://127.0.0.1:8080/mall/api/flash/sessions/list" | head -c 300; echo
+
+# 2) AI 健康检查 + 搜索计划（需另起 platform-ai；无密钥=规则降级）
+curl -sS http://127.0.0.1:8088/ai/v1/health; echo
+curl -sS -X POST http://127.0.0.1:8088/ai/v1/goods/search-plan \
+  -H 'Content-Type: application/json' \
+  -d '{"query":"300元内降噪耳机"}'; echo
+```
+
+AI 请求/响应样例：[`docs/ai/examples/`](./docs/ai/examples/)。失败分支对照：[`docs/ARCHITECTURE.md` §失败路径](./docs/ARCHITECTURE.md#秒杀主链路失败路径)。
+
+流程示意：
+
+![demo flow](docs/screenshots/demo-flow.svg "30s demo flow")
+
+> 若有终端录屏，可另存为 `docs/screenshots/demo.gif` 替换上图。
+
+## 和其他常见秒杀 Demo 比什么
+
+| 能力 | 本仓 | 常见教程 Demo |
+| --- | --- | --- |
+| 库存防超卖 | Redis Lua 原子预扣（`GoodsStockCache`） | 多为止于 DB 锁 / 单机锁示意 |
+| 削峰 | RocketMQ 异步落单 + 发送失败回补 | 常同步写库 |
+| 支付 | 回调乐观锁幂等 + 单测 | 常省略 |
+| 订单 | 状态机 | 常单表状态字段 |
+| AI | `platform-ai`：搜索计划 / 推荐 / 分析 / 场次策划，热路径不经 AI | 少见 |
+| 可运行性 | docker-compose + QUICKSTART curl | 参差 |
+
 ## 适合谁 / 边界说明
 
 | 适合 | 本仓刻意不做 / 不在本仓 |

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="220" viewBox="0 0 960 220">
+  <rect width="960" height="220" fill="#f8fafc"/>
+  <text x="24" y="36" font-family="sans-serif" font-size="16" font-weight="700" fill="#0f172a">30s demo flow</text>
+  <rect x="24" y="60" width="200" height="100" rx="12" fill="#dbeafe" stroke="#2563eb"/>
+  <text x="124" y="100" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#0f172a">1. flash sessions</text>
+  <text x="124" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">GET /mall/api/flash/...</text>
+  <text x="240" y="115" font-size="22" fill="#64748b">→</text>
+  <rect x="270" y="60" width="200" height="100" rx="12" fill="#ecfdf5" stroke="#059669"/>
+  <text x="370" y="100" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#0f172a">2. Lua pre-deduct</text>
+  <text x="370" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">GoodsStockCache</text>
+  <text x="486" y="115" font-size="22" fill="#64748b">→</text>
+  <rect x="516" y="60" width="200" height="100" rx="12" fill="#ecfdf5" stroke="#059669"/>
+  <text x="616" y="100" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#0f172a">3. RocketMQ</text>
+  <text x="616" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">async create order</text>
+  <text x="732" y="115" font-size="22" fill="#7c3aed">→</text>
+  <rect x="760" y="60" width="176" height="100" rx="12" fill="#f5f3ff" stroke="#7c3aed"/>
+  <text x="848" y="100" text-anchor="middle" font-family="sans-serif" font-size="13" fill="#0f172a">4. AI plan</text>
+  <text x="848" y="122" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#64748b">POST /ai/v1/...</text>
+  <text x="24" y="200" font-family="sans-serif" font-size="12" fill="#64748b">Replace with docs/screenshots/demo.gif when you have a screen recording.</text>
+</svg>

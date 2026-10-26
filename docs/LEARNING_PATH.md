@@ -4,6 +4,9 @@
 
 建议总时长：有 Java / Spring 基础约 **1–2 周**（含本地跑通 + 精读主链路）。
 
+
+秒杀主链路的失败分支（Lua 库存不足、MQ 发送/消费回补、支付回调幂等）见 [ARCHITECTURE.md §失败路径](./ARCHITECTURE.md#秒杀主链路失败路径)。
+
 ## 0. 先跑通（半天）
 
 1. 读根目录 [QUICKSTART.md](../QUICKSTART.md)
