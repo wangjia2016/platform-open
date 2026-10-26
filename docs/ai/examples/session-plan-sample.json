@@ -1,0 +1,23 @@
+{
+  "request": {
+    "window": { "start": "10:00", "mid": "16:00", "end": "22:00" },
+    "goodsPool": [
+      { "id": 1, "name": "降噪耳机 X", "stock": 100, "onUnSale": 0 },
+      { "id": 2, "name": "运动水杯", "stock": 50, "onUnSale": 0 }
+    ]
+  },
+  "response_rules_fallback": {
+    "degraded": true,
+    "strategy": "rules",
+    "sessions": [
+      { "name": "抢购中", "start": "10:00", "end": "16:00" },
+      { "name": "即将开始", "start": "16:00", "end": "22:00" }
+    ],
+    "bindSuggestions": [
+      { "sessionsIndex": 0, "goodsId": 1, "suggestFlashStock": 50 },
+      { "sessionsIndex": 1, "goodsId": 2, "suggestFlashStock": 25 }
+    ],
+    "riskNotes": ["规则建议：库存预扣走缓存；勿用 AI 直接改库存或支付"]
+  },
+  "notes": "AI_ENABLED+AI_API_KEY 时 strategy=llm，结构相同；解析失败回落规则"
+}

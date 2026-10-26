@@ -92,7 +92,21 @@ public class AiFacadeService {
     }
 
     public SessionPlanResponse sessionPlan(SessionPlanRequest req) {
-        // No dedicated prompt file required for v1; rules first, LLM optional via analyze-style later
-        return rules.sessionPlan(req);
+        if (!props.isLlmConfigured()) {
+            return rules.sessionPlan(req);
+        }
+        try {
+            String json = llm.chatJson(prompts.load("flash-session-plan.system.md"), objectMapper.writeValueAsString(req));
+            SessionPlanResponse resp = objectMapper.readValue(json, SessionPlanResponse.class);
+            if (resp.getSessions() == null || resp.getSessions().isEmpty()) {
+                throw new IllegalStateException("AI_BAD_OUTPUT");
+            }
+            resp.setDegraded(false);
+            resp.setStrategy("llm");
+            return resp;
+        } catch (Exception e) {
+            log.warn("session-plan LLM failed, fallback: {}", e.toString());
+            return rules.sessionPlan(req);
+        }
     }
 }

@@ -68,6 +68,15 @@ curl -sS -X POST http://127.0.0.1:8088/ai/v1/goods/search-plan \
 
 # via mall facade (app must be up): /mall/api/ai/v1/...
 curl -sS http://127.0.0.1:8080/mall/api/ai/v1/health
+
+# mall: analyze / recommend by real goodsId (read-only DB → snapshot → AI)
+curl -sS "http://127.0.0.1:8080/mall/api/ai/v1/goods/analyze-by-id?goodsId=1"
+curl -sS "http://127.0.0.1:8080/mall/api/ai/v1/goods/recommend-by-anchor?goodsId=1&limit=5"
+
+# session-plan (LLM when AI_ENABLED+key; else rules). Direct:
+curl -sS -X POST http://127.0.0.1:8088/ai/v1/flash/session-plan \
+  -H 'Content-Type: application/json' \
+  -d '{"window":{"start":"10:00","mid":"16:00","end":"22:00"},"goodsPool":[{"id":1,"name":"demo","stock":100,"onUnSale":0}]}'
 ```
 
 Set `AI_ENABLED=true` and `AI_API_KEY` only when you want real OpenAI-compatible calls. Flash order / pay paths never call AI.

@@ -78,6 +78,8 @@ platform-mall-manager/.../ai/PlatformAiClient.java     # Feign
 | POST | `/ai/v1/goods/search-plan` | 自然语言 → 搜索计划 |
 | POST | `/ai/v1/goods/recommend` | 推荐 Top-N |
 | POST | `/ai/v1/goods/analyze` | 商品分析报告 |
+| GET  | `/mall/api/ai/v1/goods/analyze-by-id?goodsId=` | mall 门面：库内商品 → 快照 → analyze（只读） |
+| GET  | `/mall/api/ai/v1/goods/recommend-by-anchor?goodsId=` | mall 门面：锚点 + 在售候选 → recommend（只读） |
 | POST | `/ai/v1/flash/session-plan` | 秒杀场次策划（延伸） |
 | GET  | `/ai/v1/health` | 含 `llmConfigured=true|false` |
 

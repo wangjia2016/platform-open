@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- AI：`session-plan` 增加 prompt + LLM 路径（失败仍规则降级）；mall 门面新增 `GET /goods/analyze-by-id`、`GET /goods/recommend-by-anchor`（只读组装快照）
 - 文档：秒杀失败路径（#9）、README 30 秒 curl 演示与对比表、AI examples 样例 JSON
 - 文档：弱化「学习脚手架」表述，README/About 改为生产实践开源整理定位
 - 文档：重绘 README 项目架构图（`docs/screenshots/architecture.svg` + Mermaid），补上 platform-ai
