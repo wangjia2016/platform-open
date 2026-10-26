@@ -26,9 +26,9 @@ AI 请求/响应样例：[`docs/ai/examples/`](./docs/ai/examples/)。失败分�
 
 流程示意：
 
-![demo flow](docs/screenshots/demo-flow.svg "30s demo flow")
+![demo flow](docs/screenshots/demo.gif "30s demo flow")
 
-> 若有终端录屏，可另存为 `docs/screenshots/demo.gif` 替换上图。
+静态版：[demo-flow.svg](docs/screenshots/demo-flow.svg)。
 
 ## 和其他常见秒杀 Demo 比什么
 
