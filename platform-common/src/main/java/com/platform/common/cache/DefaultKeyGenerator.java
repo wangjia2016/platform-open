@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 public class DefaultKeyGenerator implements KeyGenerator {
 
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(DefaultKeyGenerator.class);
 
     private static String[] types = { "java.lang.Integer", "java.lang.Double",
             "java.lang.Float", "java.lang.Long", "java.lang.Short","java.util.Date",
@@ -97,12 +97,11 @@ public class DefaultKeyGenerator implements KeyGenerator {
                     }
                 }
             } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                log.warn("Failed to read field for cache key: {}", f.getName(), e);
             } catch (IllegalAccessException e) {
-                e.printStackTrace();
+                log.warn("Failed to access field for cache key: {}", f.getName(), e);
             }
         }
-        System.out.println(sb.toString());
         return sb.toString();
     }
 }

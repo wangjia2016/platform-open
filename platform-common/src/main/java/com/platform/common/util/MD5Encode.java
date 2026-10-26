@@ -1,10 +1,13 @@
 package com.platform.common.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.security.MessageDigest;
 
 /**
  * @（#）MD5Encode.java
- * 
+ *
  * @description: MD5加密-sha1
  * @author: 王佳 2014/03/28
  * @version: Version No.
@@ -13,9 +16,11 @@ import java.security.MessageDigest;
  */
 public class MD5Encode {
 
+	private static final Logger log = LoggerFactory.getLogger(MD5Encode.class);
+
 	/**
 	 * 加密字符串
-	 * 
+	 *
 	 * @param str
 	 *            需加密的字符串
 	 * @return 加密后的字符串
@@ -39,18 +44,11 @@ public class MD5Encode {
 			}
 			return hexString.toString();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+			log.warn("MessageDigest encode failed, type={}", encodeType, e);
+		}
 		return null;
 	}
 
-	public  static void main(String[] args) {
-		
-		System.out.println(encode("123456","md5"));
-	}
-	
-	
 	public static boolean isMatch(String password,String inputString){
 		if(password.equals(encode(inputString,"md5"))){
 			return true;

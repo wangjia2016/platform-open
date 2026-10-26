@@ -24,7 +24,7 @@ feign:
     max-connections-per-route: 50
 
 # Prefer env JWT_SECRET / JWT_EXPIRE_SECONDS (see .env.example). Do not commit real secrets.
-# JwtOperator binds jwt.secret / jwt.expire-time-in-second.
+# JwtOperator requires jwt.secret (no weak Java default); binds jwt.expire-time-in-second.
 jwt:
   secret: ${JWT_SECRET:change-me-use-a-long-random-string}
   # 有效期，单位秒，默认2周

@@ -25,9 +25,4 @@ public class UUIDUtils {
     	return UUID.randomUUID().toString();
     }
 
-    
-    public static void main(String[] args) {
-        System.out.println(getUUID36());
-    }
-    
 }

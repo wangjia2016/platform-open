@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
@@ -17,6 +19,8 @@ import java.util.List;
  * @author wangjia
  */
 public class JsonUtil {
+
+	private static final Logger log = LoggerFactory.getLogger(JsonUtil.class);
 
 	private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -47,7 +51,7 @@ public class JsonUtil {
 		try {
 			s = objectMapper.writeValueAsString(o);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("JSON convert failed", e);
 		}
 		return s;
 	}
@@ -87,7 +91,7 @@ public class JsonUtil {
 		try {
 			t = objectMapper.readValue(json, c);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("JSON convert failed", e);
 		}
 		return t;
 	}
@@ -102,7 +106,7 @@ public class JsonUtil {
 		try {
 			t = (T) objectMapper.readValue(json, tr);
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.warn("JSON convert failed", e);
 		}
 		return (T) t;
 	}
