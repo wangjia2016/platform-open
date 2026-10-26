@@ -5,7 +5,7 @@
 [![CI](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml/badge.svg)](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
 
 ## 1.项目说明
-- 本项目基于 Spring Boot 2.3.4、Spring Cloud Hoxton.SR8、Spring Cloud Alibaba 2.2.3.RELEASE（版本以根目录 `pom.xml` 为准，并非跟踪各组件最新发行版）
+- 本项目基于 Spring Boot 2.3.4、Spring Cloud Hoxton.SR12、Spring Cloud Alibaba 2.2.9.RELEASE（版本以根目录 `pom.xml` 为准，并非跟踪各组件最新发行版）
 - 关于 Spring Cloud、Spring Cloud Alibaba、Spring Boot 三者的版本依赖关系，参见 Spring Cloud 官方文档
 - 本项目可作为微服务学习/脚手架参考，整合了 Nacos、RocketMQ、Sentinel、Feign、Redis、Redisson、JJWT、MyBatis 等常见组件
 - 网关采用 Spring Cloud Gateway，为另外一个单独的项目（不在本仓库）
@@ -20,8 +20,8 @@
 | 组件 | 版本 |
 | --- | --- |
 | Spring Boot | 2.3.4.RELEASE |
-| Spring Cloud | Hoxton.SR8 |
-| Spring Cloud Alibaba | 2.2.3.RELEASE |
+| Spring Cloud | Hoxton.SR12 |
+| Spring Cloud Alibaba | 2.2.9.RELEASE |
 | Java | 1.8 |
 | MyBatis-Plus | 3.4.0 |
 | rocketmq-spring-boot-starter | 2.0.3 |
@@ -72,8 +72,8 @@
 ![系统架构](https://cdn.fanguwan.com/github/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE-%E7%A7%92%E6%9D%80.png "架构图")
 
 ## 6. 技术栈
-- Spring Cloud Hoxton.SR8
-- Spring Cloud Alibaba 2.2.3.RELEASE
+- Spring Cloud Hoxton.SR12
+- Spring Cloud Alibaba 2.2.9.RELEASE
 - Nacos
 - OpenFeign
 - Ribbon
