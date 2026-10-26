@@ -52,3 +52,9 @@
 ## 5. 升级与边界（选修）
 
 Boot / Cloud 大版本升级 **不在** 默认学习路径内（成本高、易踩坑）。若要做，请单独开 Issue 讨论范围，避免 Dependabot 大跨度 PR 直接合入。
+
+## 6. AI 辅助（选修）
+
+1. 读 [ai/README.md](./ai/README.md) 与 [ai/ARCHITECTURE.md](./ai/ARCHITECTURE.md)（为何独立 `platform-ai`）
+2. 用 `ai/examples/sample-goods.json` + `ai/skills/goods-analyze.md` 做一次无密钥演练
+3. 第二期实现时按架构文 §8 清单，勿把 AI 接到秒杀扣库存路径

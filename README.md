@@ -16,6 +16,12 @@
 
 **5 分钟上手：** 见 [QUICKSTART.md](./QUICKSTART.md)（`docker compose up -d` → 启动 `platform-mall-web`）。
 
+### AI 辅助（商城场景）
+
+- **第一期（文档）：** [docs/ai/README.md](docs/ai/README.md) — Agent / Skills / 提示词
+- **架构与是否独立服务：** [docs/ai/ARCHITECTURE.md](docs/ai/ARCHITECTURE.md) — 结论为仓内独立模块 `platform-ai`，mall Feign 调用；秒杀主链路不经过 AI
+- **第二期：** 按该文档 §8 落地可调用 API（默认关闭，可降级）
+
 ## 1. 项目说明
 
 - 技术基线：Spring Boot **2.3.4**、Spring Cloud **Hoxton.SR12**、Spring Cloud Alibaba **2.2.9.RELEASE**（以根目录 `pom.xml` 为准）

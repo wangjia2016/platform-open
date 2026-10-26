@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "name": "示例降噪耳机 Pro",
+    "title": "通勤降噪 · 长续航",
+    "code": "SKU-DEMO-001",
+    "typeId": 100,
+    "brandId": 10,
+    "stock": 5,
+    "stockWarn": 10,
+    "auditStatus": 2,
+    "onUnSale": 0,
+    "proposedPrice": 399.00,
+    "price": 299.00,
+    "isRefund": 0,
+    "unit": "件"
+  },
+  {
+    "id": 2,
+    "name": "示例运动蓝牙耳机",
+    "title": "防汗 · 轻巧",
+    "code": "SKU-DEMO-002",
+    "typeId": 100,
+    "brandId": 11,
+    "stock": 120,
+    "stockWarn": 20,
+    "auditStatus": 2,
+    "onUnSale": 0,
+    "proposedPrice": 199.00,
+    "price": 159.00,
+    "isRefund": 0,
+    "unit": "件"
+  }
+]
