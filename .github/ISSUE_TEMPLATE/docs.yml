@@ -1,0 +1,18 @@
+name: 文档 / 学习资料
+description: README、QUICKSTART、架构或学习路径相关改进
+title: "[docs] "
+labels: ["documentation", "good first issue"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 哪里不清楚或不一致
+      description: 文件路径 + 现象（过时、缺步骤、和代码不符等）
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 建议怎么改
+    validations:
+      required: false

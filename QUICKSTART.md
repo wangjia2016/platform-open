@@ -1,5 +1,7 @@
 # Quick start
 
+跑通后建议接着看 [docs/LEARNING_PATH.md](./docs/LEARNING_PATH.md) 与 [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)。
+
 Minimal path to bring up local infra and run `platform-mall-web` against it.
 
 ## 1. Prerequisites

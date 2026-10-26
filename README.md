@@ -1,19 +1,28 @@
-本项目持续完善中... 具体技术详解与业务设计，参见 WIKI。
+# platform-open
 
-**社区与安全：** [贡献指南](CONTRIBUTING.md) · [安全披露](SECURITY.md) · License: Apache-2.0
+**Spring Cloud Alibaba 微服务学习脚手架**（商城秒杀示例）。适合想把 Nacos / Redis / RocketMQ / Feign / Redisson 等串成一条可运行业务链路的同学；不是「生产级完整商城」，也不是跟踪最新 Boot/Cloud 的发行版。
 
-[![CI](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml/badge.svg)](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE)
+**社区与安全：** [贡献指南](CONTRIBUTING.md) · [安全披露](SECURITY.md) · [学习路径](docs/LEARNING_PATH.md) · [架构说明](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · License: Apache-2.0
 
-## 1.项目说明
-- 本项目基于 Spring Boot 2.3.4、Spring Cloud Hoxton.SR12、Spring Cloud Alibaba 2.2.9.RELEASE（版本以根目录 `pom.xml` 为准，并非跟踪各组件最新发行版）
-- 关于 Spring Cloud、Spring Cloud Alibaba、Spring Boot 三者的版本依赖关系，参见 Spring Cloud 官方文档
-- 本项目可作为微服务学习/脚手架参考，整合了 Nacos、RocketMQ、Sentinel、Feign、Redis、Redisson、JJWT、MyBatis 等常见组件
-- 网关采用 Spring Cloud Gateway，为另外一个单独的项目（不在本仓库）
-- 以商城秒杀下单为例：可售库存用 Redis Lua 原子扣减（`GoodsStockCache`），RocketMQ 异步下单/削峰；Redisson 仍作分布式锁基础设施（解锁请走 `RedissonLocks.safeUnlock`）
-- 基于 Redis 的幂等性方案
-- 全局统一异常处理
-- 业务：秒杀、优惠券、微信支付、商品配置、订单
-- 设计模式：工厂模式、策略模式、模板方法、状态机模式等
+[![CI](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml/badge.svg)](https://github.com/wangjia2016/platform-open/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](./LICENSE) [![Java](https://img.shields.io/badge/Java-8-orange.svg)](./pom.xml) [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.3.4-brightgreen.svg)](./pom.xml)
+
+## 适合谁 / 不适合谁
+
+| 适合 | 不太适合 |
+| --- | --- |
+| 用真实业务（秒杀）理解微服务组件怎么配合 | 要开箱即用的完整 C 端 App / 独立 Gateway 仓 |
+| 学习库存防超卖、MQ 削峰、支付幂等、订单状态机 | 要直接上生产的多机高可用方案 |
+| 按 [学习路径](docs/LEARNING_PATH.md) 读代码 + 本地 docker-compose 跑通 | 要 Boot 3 / 最新 Alibaba 的版本追随 |
+
+**5 分钟上手：** 见 [QUICKSTART.md](./QUICKSTART.md)（`docker compose up -d` → 启动 `platform-mall-web`）。
+
+## 1. 项目说明
+
+- 技术基线：Spring Boot **2.3.4**、Spring Cloud **Hoxton.SR12**、Spring Cloud Alibaba **2.2.9.RELEASE**（以根目录 `pom.xml` 为准）
+- 整合组件：Nacos、RocketMQ、Sentinel、Feign、Redis、Redisson、JJWT、MyBatis 等
+- 业务示例：秒杀、优惠券、微信支付、商品配置、订单（完整度以代码为准；网关为独立工程，不在本仓）
+- 秒杀当前路径：Redis Lua 原子预扣可售库存（`GoodsStockCache`）+ RocketMQ 异步落单；Redisson 作锁基础设施（解锁请走 `RedissonLocks.safeUnlock`）
+- 另有：基于 Redis 的幂等、全局统一异常、常见设计模式落点（工厂 / 策略 / 模板方法 / 状态机等）
 
 ### 主要版本（摘自根 `pom.xml` / 子模块）
 
@@ -33,7 +42,20 @@
 | Lombok | 1.18.8 |
 | Jedis | 3.3.0 |
 
-说明：README 技术栈中若仍写「RocketMQ 4.7.1」等，指常见 Broker/运维侧版本；本仓 Maven 依赖以表内为准。
+说明：若文中仍出现「RocketMQ 4.7.1」等，多指常见 Broker/运维侧版本；本仓 Maven 依赖以表内为准。
+
+### 模块一览
+
+| 模块 | 作用 |
+| --- | --- |
+| `platform-common` | JWT、锁工具、公共异常与基础能力 |
+| `platform-mall-web` | HTTP 入口（portal / admin） |
+| `platform-mall-service` | 领域服务、状态机、MQ 消费等 |
+| `platform-mall-manager` | 缓存与外部资源封装（含 `GoodsStockCache`） |
+| `platform-mall-dao` | MyBatis 实体 / Mapper / SQL |
+| `platform-starter` | 启动侧脚手架能力 |
+
+更细的依赖关系与秒杀时序见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
 
 ## 2.秒杀介绍
 - 秒杀的难点
@@ -69,7 +91,20 @@
   - 幂等性校验
 
 ## 5. 项目架构图
-![系统架构](https://cdn.fanguwan.com/github/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E6%9E%B6%E6%9E%84%E5%9B%BE-%E7%A7%92%E6%9D%80.png "架构图")
+
+原 CDN 外链图已失效。当前以仓库内 Mermaid 为准（GitHub 可直接渲染）：
+
+- 模块依赖与秒杀时序：[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+
+```mermaid
+flowchart LR
+  Client --> Web[mall-web]
+  Web --> Lua[Redis Lua 库存]
+  Web --> MQ[RocketMQ]
+  MQ --> DB[(MySQL)]
+  Web --> Redis[(Redis / Redisson)]
+  Web --> Nacos[Nacos]
+```
 
 ## 6. 技术栈
 - Spring Cloud Hoxton.SR12

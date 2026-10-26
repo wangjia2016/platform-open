@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 安全披露
+    url: https://github.com/wangjia2016/platform-open/blob/master/SECURITY.md
+    about: 请勿在公开 Issue 中讨论未修复的安全问题
+  - name: 学习路径
+    url: https://github.com/wangjia2016/platform-open/blob/master/docs/LEARNING_PATH.md
+    about: 先看推荐阅读顺序，再开「文档改进」类 Issue
