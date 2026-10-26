@@ -5,6 +5,7 @@
 ## Unreleased
 
 - 文档：学习路径、架构模块图（Mermaid）、公开 Roadmap；README 改为脚手架/学习定位
+- 文档：QUICKSTART 增加 curl 冒烟验收；Dependabot 忽略 Boot/Cloud major
 
 ## 2026-10-26
 

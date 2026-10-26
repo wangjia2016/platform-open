@@ -59,6 +59,25 @@ App default: `http://localhost:8080/mall`
 docker compose down
 ```
 
+
+## 6. Smoke check (curl)
+
+App context-path is `/mall`. Flash portal APIs **do not require login** (see `MallFlashPortalController`).
+
+```bash
+# 场次列表（种子导入后应返回业务 JSON；空列表也算通）
+curl -sS "http://127.0.0.1:8080/mall/api/flash/sessions/list" | head -c 400; echo
+
+# 场次详情 / 场次商品（把 1 换成实际上有的 sessionsId）
+curl -sS "http://127.0.0.1:8080/mall/api/flash/sessions/detail?sessionsId=1" | head -c 400; echo
+curl -sS "http://127.0.0.1:8080/mall/api/flash/sessions/goods?sessionsId=1" | head -c 400; echo
+
+# 可选：测试 JWT（需已配置 JWT_SECRET）
+curl -sS "http://127.0.0.1:8080/mall/api/basic/getTestToken" | head -c 400; echo
+```
+
+期望：HTTP 非 404；JSON 里常见 `code` / `data` 字段（具体以 `Result` 为准）。连不上先确认应用已起、Nacos/MySQL 就绪。
+
 ## Troubleshooting
 
 - **RocketMQ from host**: if producers cannot reach the broker, set `brokerIP1` to your host LAN IP in a custom broker conf mounted into the broker container (Docker Desktop networking quirk).
