@@ -174,10 +174,3 @@ Copyright 2020-2026 wangjia2016
 ### 我的订单
 ![我的订单](docs/screenshots/c-order-list.jpg "我的订单")
 
-<details>
-<summary>历史外链截图（CDN，可能失效）</summary>
-
-![前端效果](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%89%8D%E7%AB%AF.png "前端效果-秒杀商品列表")
-![前端效果](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%89%8D%E7%AB%AF2.png "秒杀详情页")
-
-</details>
