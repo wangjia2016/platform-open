@@ -145,6 +145,39 @@ Copyright 2020-2026 wangjia2016
 
 ## 15.功能截图
 
-- 前端效果
+以下为 **C 端示意稿**（参考主流电商 App 的信息架构与交互节奏，原创 UI，非真实线上页面截图；本仓库目前主要是后端/秒杀能力，前端仅为说明用）。
+
+| 页面 | 说明 |
+| --- | --- |
+| 首页 | 搜索、超级秒杀入口、限时秒杀横滑、猜你喜欢 |
+| 秒杀场次 | 多场次 Tab（抢购中 / 即将开始）+ 双列商品 |
+| 场次商品列表 | 单场倒计时、已抢进度、库存条、抢购按钮 |
+| 商品详情 | 秒杀价、倒计时、规格、评价、立即秒杀 |
+| 确认订单 | 地址、优惠券、支付方式、提交订单 |
+| 我的订单 | 待付款 / 待发货等状态与操作 |
+
+### 首页
+![C端首页](docs/screenshots/c-home.jpg "C端首页")
+
+### 秒杀场次
+![秒杀场次](docs/screenshots/c-flash-sessions.jpg "秒杀场次")
+
+### 场次商品列表
+![场次商品列表](docs/screenshots/c-flash-goods.jpg "场次商品列表")
+
+### 商品详情（秒杀）
+![商品详情](docs/screenshots/c-goods-detail.jpg "商品详情秒杀")
+
+### 确认订单
+![确认订单](docs/screenshots/c-order-confirm.jpg "确认订单")
+
+### 我的订单
+![我的订单](docs/screenshots/c-order-list.jpg "我的订单")
+
+<details>
+<summary>历史外链截图（CDN，可能失效）</summary>
+
 ![前端效果](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%89%8D%E7%AB%AF.png "前端效果-秒杀商品列表")
 ![前端效果](https://cdn.fanguwan.com/github/%E7%A7%92%E6%9D%80%E5%89%8D%E7%AB%AF2.png "秒杀详情页")
+
+</details>
