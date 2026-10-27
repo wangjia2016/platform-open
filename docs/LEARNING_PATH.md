@@ -61,3 +61,7 @@ Boot / Cloud 大版本升级 **不在** 默认学习路径内（成本高、易�
 1. 读 [ai/README.md](./ai/README.md) 与 [ai/ARCHITECTURE.md](./ai/ARCHITECTURE.md)（为何独立 `platform-ai`）
 2. 用 `ai/examples/sample-goods.json` + `ai/skills/goods-analyze.md` 做一次无密钥演练
 3. 第二期实现时按架构文 §8 清单，勿把 AI 接到秒杀扣库存路径
+
+## 代码地图
+
+按类名速查见 [CODE_MAP.md](./CODE_MAP.md)；秒杀 HTTP 验收见 [FLASH_DEMO_CHECKLIST.md](./FLASH_DEMO_CHECKLIST.md)。

@@ -112,6 +112,8 @@ curl -sS "http://127.0.0.1:8080/mall/api/basic/getTestToken" | head -c 400; echo
 
 期望：HTTP 非 404；JSON 里常见 `code` / `data` 字段（具体以 `Result` 为准）。连不上先确认应用已起、Nacos/MySQL 就绪。
 
+完整秒杀下单（鉴权 + 幂等 + createOrder）见 [`scripts/flash-order-demo.sh`](./scripts/flash-order-demo.sh) 与验收清单 [docs/FLASH_DEMO_CHECKLIST.md](./docs/FLASH_DEMO_CHECKLIST.md)。
+
 ## Troubleshooting
 
 - **RocketMQ from host**: if producers cannot reach the broker, set `brokerIP1` to your host LAN IP in a custom broker conf mounted into the broker container (Docker Desktop networking quirk).

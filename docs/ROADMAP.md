@@ -7,14 +7,14 @@
 - [x] OSS 卫生：密钥占位、CI、CONTRIBUTING / SECURITY、docker-compose + QUICKSTART
 - [x] 秒杀主链路加固：Lua 库存、支付回调幂等、Redisson 安全解锁、订单状态机单测
 - [x] C 端示意截图（`docs/screenshots`）与诚实 README
-- [ ] 学习向文档：架构图（本地 Mermaid）、学习路径、模块地图（本迭代）
+- [x] 学习向文档：架构图（本地 Mermaid）、学习路径、模块地图（本迭代）
 - [x] 社区信号：good-first-issue、清理无效 Dependabot；GitHub topics/About 描述需在网页或 `gh` 侧再改（本机无 gh）
 - [x] Dependabot：忽略 Boot / Cloud major 与不存在的 Alibaba 小版本
 
 ## Next
 
-- [ ] 最小可演示的「秒杀下单」HTTP 脚本 / 验收清单（不引入完整前端工程）
-- [ ] 设计模式与业务点的「代码地图」索引（类名 + 一句话）
+- [x] 最小可演示的「秒杀下单」HTTP 脚本 / 验收清单（不引入完整前端工程）
+- [x] 设计模式与业务点的「代码地图」索引（类名 + 一句话）
 - [ ] Wiki 或 docs 内迁移原「WIKI」承诺中的稳定篇章
 - [ ] Dependabot 策略收紧：忽略 Boot 大跨度主版本
 

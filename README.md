@@ -24,6 +24,8 @@ curl -sS -X POST http://127.0.0.1:8088/ai/v1/goods/search-plan \
 
 AI 请求/响应样例：[`docs/ai/examples/`](./docs/ai/examples/)。失败分支对照：[`docs/ARCHITECTURE.md` §失败路径](./docs/ARCHITECTURE.md#秒杀主链路失败路径)。
 
+秒杀下单 HTTP 演示（需已起 mall + 种子数据）：[`scripts/flash-order-demo.sh`](./scripts/flash-order-demo.sh) · 验收清单 [`docs/FLASH_DEMO_CHECKLIST.md`](./docs/FLASH_DEMO_CHECKLIST.md) · 代码地图 [`docs/CODE_MAP.md`](./docs/CODE_MAP.md)。
+
 C 端示意流程（原创 UI 示意稿串成，非线上录屏）：
 
 ![C端秒杀流程示意](docs/screenshots/demo.gif "C端秒杀：首页→场次→详情→下单→订单")

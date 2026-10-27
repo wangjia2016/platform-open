@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- 文档/脚本：`scripts/flash-order-demo.sh` + [FLASH_DEMO_CHECKLIST](docs/FLASH_DEMO_CHECKLIST.md)；[CODE_MAP](docs/CODE_MAP.md) 类名索引
 - AI：session-plan 输出校验（goodsId/库存/场次下标）；按能力 LLM 开关 `platform.ai.features.*`；mall `GET /flash/session-plan-from-onsale`
 - AI：`session-plan` 增加 prompt + LLM 路径（失败仍规则降级）；mall 门面新增 `GET /goods/analyze-by-id`、`GET /goods/recommend-by-anchor`（只读组装快照）
 - 文档：秒杀失败路径（#9）、README 30 秒 curl 演示与对比表、AI examples 样例 JSON
