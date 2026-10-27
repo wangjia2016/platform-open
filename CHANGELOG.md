@@ -4,6 +4,7 @@
 
 ## Unreleased
 
+- 文档：收官 ROADMAP 剩余项 — [docs/wiki](docs/wiki/README.md)、[UPGRADE_BOOT](docs/UPGRADE_BOOT.md)、[GATEWAY](docs/GATEWAY.md)、[COUPON_AND_AUTH](docs/COUPON_AND_AUTH.md)、[ai/PHASE3](docs/ai/PHASE3.md)；Dependabot 扩大 major ignore
 - 文档/脚本：`scripts/flash-order-demo.sh` + [FLASH_DEMO_CHECKLIST](docs/FLASH_DEMO_CHECKLIST.md)；[CODE_MAP](docs/CODE_MAP.md) 类名索引
 - AI：session-plan 输出校验（goodsId/库存/场次下标）；按能力 LLM 开关 `platform.ai.features.*`；mall `GET /flash/session-plan-from-onsale`
 - AI：`session-plan` 增加 prompt + LLM 路径（失败仍规则降级）；mall 门面新增 `GET /goods/analyze-by-id`、`GET /goods/recommend-by-anchor`（只读组装快照）

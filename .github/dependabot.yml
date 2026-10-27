@@ -11,15 +11,24 @@ updates:
     schedule:
       interval: monthly
     open-pull-requests-limit: 5
-    # 本仓是 Boot 2.3 + Hoxton 学习脚手架：拒绝大跨度主版本噪声 PR
+    # 本仓钉在 Boot 2.3 + Hoxton：拒绝大跨度主版本噪声 PR（评估见 docs/UPGRADE_BOOT.md）
     ignore:
+      - dependency-name: "org.springframework.boot:*"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "org.springframework.boot:spring-boot-starter-parent"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "org.springframework.cloud:*"
         update-types: ["version-update:semver-major"]
       - dependency-name: "org.springframework.cloud:spring-cloud-dependencies"
         update-types: ["version-update:semver-major"]
+      - dependency-name: "org.springframework:*"
+        update-types: ["version-update:semver-major"]
       - dependency-name: "com.alibaba.cloud:spring-cloud-alibaba-dependencies"
+        update-types: ["version-update:semver-major"]
         versions: [">=2.2.10"]
       - dependency-name: "io.jsonwebtoken:*"
         update-types: ["version-update:semver-major"]
       - dependency-name: "com.baomidou:mybatis-plus-boot-starter"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "org.apache.rocketmq:*"
         update-types: ["version-update:semver-major"]

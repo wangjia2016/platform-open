@@ -65,3 +65,5 @@ Boot / Cloud 大版本升级 **不在** 默认学习路径内（成本高、易�
 ## 代码地图
 
 按类名速查见 [CODE_MAP.md](./CODE_MAP.md)；秒杀 HTTP 验收见 [FLASH_DEMO_CHECKLIST.md](./FLASH_DEMO_CHECKLIST.md)。
+
+概念与部署稳定篇：[wiki/README.md](./wiki/README.md)。Boot 升级评估与 Gateway 决策见同目录 `UPGRADE_BOOT.md` / `GATEWAY.md`。

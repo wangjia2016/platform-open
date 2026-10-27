@@ -42,3 +42,7 @@ docs/ai/
 - 订单/支付：状态机与支付回调幂等（分析/风控 Skill 只读复盘，第一期不写库）
 
 学习路径选修入口见 [../LEARNING_PATH.md](../LEARNING_PATH.md)。
+
+## Phase 3（更晚）
+
+方案与硬边界见 [PHASE3.md](./PHASE3.md)（ES/行为/写回；默认不进支付与库存主链路）。

@@ -15,14 +15,14 @@
 
 - [x] 最小可演示的「秒杀下单」HTTP 脚本 / 验收清单（不引入完整前端工程）
 - [x] 设计模式与业务点的「代码地图」索引（类名 + 一句话）
-- [ ] Wiki 或 docs 内迁移原「WIKI」承诺中的稳定篇章
-- [ ] Dependabot 策略收紧：忽略 Boot 大跨度主版本
+- [x] Wiki 或 docs 内迁移原「WIKI」承诺中的稳定篇章（见 [docs/wiki](./wiki/README.md)）
+- [x] Dependabot 策略收紧：忽略 Boot / Cloud / Spring / Alibaba **major**（`.github/dependabot.yml`）
 
 ## Later
 
-- [ ] Boot 2.7 / 3.x 升级评估（单独里程碑，不做顺手升级）
-- [ ] Gateway 示例是否独立仓开源
-- [ ] 更完整的优惠券 / 权限示例文档化
+- [x] Boot 2.7 / 3.x 升级评估（[UPGRADE_BOOT.md](./UPGRADE_BOOT.md)；不做顺手升级）
+- [x] Gateway 示例是否独立仓开源（决策：[GATEWAY.md](./GATEWAY.md) — 继续另仓）
+- [x] 更完整的优惠券 / 权限示例文档化（诚实范围：[COUPON_AND_AUTH.md](./COUPON_AND_AUTH.md)）
 
 
 ## AI（商城）
@@ -30,6 +30,6 @@
 - [x] 第一期：`docs/ai` 架构定稿（独立 `platform-ai` + Feign）+ Agents/Skills/prompts
 - [x] 第二期：按 [ai/ARCHITECTURE.md](./ai/ARCHITECTURE.md) §8 **全部落地**（search-plan / recommend / analyze / session-plan、降级、mall 门面、配置与 curl）
 - [x] AI 深化：`session-plan` LLM 路径；mall `analyze-by-id` / `recommend-by-anchor`（只读）
-- [ ] 更晚：ES/向量检索、行为推荐、AI 写回运营动作（默认仍不进支付/库存主链路）
+- [x] 更晚方案文档化：ES/向量、行为推荐、AI 写回边界（[ai/PHASE3.md](./ai/PHASE3.md)；实现另立里程碑）
 
 反馈请开 Issue；安全问题走 [SECURITY.md](../SECURITY.md)。

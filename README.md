@@ -59,6 +59,8 @@ C 端示意流程（原创 UI 示意稿串成，非线上录屏）：
 - **架构与是否独立服务：** [docs/ai/ARCHITECTURE.md](docs/ai/ARCHITECTURE.md) — 结论为仓内独立模块 `platform-ai`，mall Feign 调用；秒杀主链路不经过 AI
 - **第二期（已落地）：** 模块 `platform-ai`（8088）+ 门面 `/mall/api/ai/v1/*`；默认规则降级，`AI_ENABLED`+`AI_API_KEY` 后走模型
 
+稳定 Wiki 篇章已迁入 [`docs/wiki/`](./docs/wiki/README.md)（概念 / 演变 / 技术栈 / 部署 / 模块）。
+
 ## 1. 项目说明
 
 - 技术基线：Spring Boot **2.3.4**、Spring Cloud **Hoxton.SR12**、Spring Cloud Alibaba **2.2.9.RELEASE**（以根目录 `pom.xml` 为准）
