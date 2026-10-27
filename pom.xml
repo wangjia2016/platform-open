@@ -23,7 +23,7 @@
 
     <properties>
         <lombok.version>1.18.8</lombok.version>
-        <mybatisplus.version>3.4.0</mybatisplus.version>
+        <mybatisplus.version>3.5.17</mybatisplus.version>
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
         <rocketmq-spring.version>2.0.3</rocketmq-spring.version>
         <guava.version>32.1.3-jre</guava.version>
