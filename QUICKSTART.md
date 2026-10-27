@@ -73,6 +73,12 @@ curl -sS http://127.0.0.1:8080/mall/api/ai/v1/health
 curl -sS "http://127.0.0.1:8080/mall/api/ai/v1/goods/analyze-by-id?goodsId=1"
 curl -sS "http://127.0.0.1:8080/mall/api/ai/v1/goods/recommend-by-anchor?goodsId=1&limit=5"
 
+# mall: session-plan from on-sale goods pool (read-only)
+curl -sS "http://127.0.0.1:8080/mall/api/ai/v1/flash/session-plan-from-onsale?limit=10"
+
+# optional: disable one capability while LLM is on
+# AI_FEATURE_SESSION_PLAN=false
+
 # session-plan (LLM when AI_ENABLED+key; else rules). Direct:
 curl -sS -X POST http://127.0.0.1:8088/ai/v1/flash/session-plan \
   -H 'Content-Type: application/json' \

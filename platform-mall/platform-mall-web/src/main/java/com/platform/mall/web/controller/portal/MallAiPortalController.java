@@ -21,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Mall facade for platform-ai. Does not sit on flash stock / pay paths.
@@ -120,6 +122,43 @@ public class MallAiPortalController {
     @PostMapping("/flash/session-plan")
     public Result sessionPlan(@RequestBody SessionPlanRequest request) {
         return forward(() -> platformAiClient.sessionPlan(request));
+    }
+
+    @ApiOperation("用在售商品池做场次策划（只读抽样，不写场次/库存）")
+    @GetMapping("/flash/session-plan-from-onsale")
+    public Result sessionPlanFromOnsale(@RequestParam(value = "limit", defaultValue = "20") Integer limit,
+                                        @RequestParam(value = "start", defaultValue = "10:00") String start,
+                                        @RequestParam(value = "mid", defaultValue = "16:00") String mid,
+                                        @RequestParam(value = "end", defaultValue = "22:00") String end) {
+        return forward(() -> {
+            int cap = limit == null ? 20 : Math.min(50, Math.max(1, limit));
+            List<MallGoodsListDto> listed = mallGoodsService.listMallGoods(MallGoodsQuery.builder()
+                    .onUnSale(0)
+                    .build());
+            SessionPlanRequest req = new SessionPlanRequest();
+            Map<String, String> window = new HashMap<String, String>();
+            window.put("start", start);
+            window.put("mid", mid);
+            window.put("end", end);
+            req.setWindow(window);
+            List<GoodsSnapshot> pool = new ArrayList<GoodsSnapshot>();
+            if (listed != null) {
+                for (MallGoodsListDto g : listed) {
+                    if (g.getId() == null) {
+                        continue;
+                    }
+                    if (g.getStock() != null && g.getStock() <= 0) {
+                        continue;
+                    }
+                    pool.add(AiGoodsSnapshotFactory.fromList(g));
+                    if (pool.size() >= cap) {
+                        break;
+                    }
+                }
+            }
+            req.setGoodsPool(pool);
+            return platformAiClient.sessionPlan(req);
+        });
     }
 
     private Result forward(SupplierResult supplier) {

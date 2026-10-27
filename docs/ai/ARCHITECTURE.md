@@ -1,6 +1,6 @@
 # AI 技术设计与架构（第一期定稿 / 第二期实施）
 
-> **第二期实施状态（本仓）：** 已落地模块 `platform-ai` + mall Feign 门面 `/mall/api/ai/v1/*`；默认 `AI_ENABLED=false`，走规则降级。
+> **第二期实施状态（本仓）：** 已落地模块 `platform-ai` + mall Feign 门面 `/mall/api/ai/v1/*`；默认 `AI_ENABLED=false`，走规则降级；开启后可用 `platform.ai.features.*` / `AI_FEATURE_*` 按能力关 LLM。session-plan 结果会校验 goodsId/库存。
 
 ## 1. 要解决什么
 
@@ -80,6 +80,7 @@ platform-mall-manager/.../ai/PlatformAiClient.java     # Feign
 | POST | `/ai/v1/goods/analyze` | 商品分析报告 |
 | GET  | `/mall/api/ai/v1/goods/analyze-by-id?goodsId=` | mall 门面：库内商品 → 快照 → analyze（只读） |
 | GET  | `/mall/api/ai/v1/goods/recommend-by-anchor?goodsId=` | mall 门面：锚点 + 在售候选 → recommend（只读） |
+| GET  | `/mall/api/ai/v1/flash/session-plan-from-onsale` | mall 门面：在售商品池 → session-plan（只读） |
 | POST | `/ai/v1/flash/session-plan` | 秒杀场次策划（延伸） |
 | GET  | `/ai/v1/health` | 含 `llmConfigured=true|false` |
 

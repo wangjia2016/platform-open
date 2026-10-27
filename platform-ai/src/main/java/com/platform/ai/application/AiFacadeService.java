@@ -39,7 +39,7 @@ public class AiFacadeService {
     }
 
     public SearchPlanResponse searchPlan(SearchPlanRequest req) {
-        if (!props.isLlmConfigured()) {
+        if (!props.llmAllowed("search-plan")) {
             return rules.searchPlan(req);
         }
         try {
@@ -55,7 +55,7 @@ public class AiFacadeService {
     }
 
     public RecommendResponse recommend(RecommendRequest req) {
-        if (!props.isLlmConfigured()) {
+        if (!props.llmAllowed("recommend")) {
             return rules.recommend(req);
         }
         try {
@@ -76,7 +76,7 @@ public class AiFacadeService {
     }
 
     public AnalyzeResponse analyze(AnalyzeRequest req) {
-        if (!props.isLlmConfigured()) {
+        if (!props.llmAllowed("analyze")) {
             return rules.analyze(req);
         }
         try {
@@ -92,21 +92,24 @@ public class AiFacadeService {
     }
 
     public SessionPlanResponse sessionPlan(SessionPlanRequest req) {
-        if (!props.isLlmConfigured()) {
-            return rules.sessionPlan(req);
-        }
-        try {
-            String json = llm.chatJson(prompts.load("flash-session-plan.system.md"), objectMapper.writeValueAsString(req));
-            SessionPlanResponse resp = objectMapper.readValue(json, SessionPlanResponse.class);
-            if (resp.getSessions() == null || resp.getSessions().isEmpty()) {
-                throw new IllegalStateException("AI_BAD_OUTPUT");
+        SessionPlanResponse raw;
+        if (!props.llmAllowed("session-plan")) {
+            raw = rules.sessionPlan(req);
+        } else {
+            try {
+                String json = llm.chatJson(prompts.load("flash-session-plan.system.md"), objectMapper.writeValueAsString(req));
+                SessionPlanResponse resp = objectMapper.readValue(json, SessionPlanResponse.class);
+                if (resp.getSessions() == null || resp.getSessions().isEmpty()) {
+                    throw new IllegalStateException("AI_BAD_OUTPUT");
+                }
+                resp.setDegraded(false);
+                resp.setStrategy("llm");
+                raw = resp;
+            } catch (Exception e) {
+                log.warn("session-plan LLM failed, fallback: {}", e.toString());
+                raw = rules.sessionPlan(req);
             }
-            resp.setDegraded(false);
-            resp.setStrategy("llm");
-            return resp;
-        } catch (Exception e) {
-            log.warn("session-plan LLM failed, fallback: {}", e.toString());
-            return rules.sessionPlan(req);
         }
+        return SessionPlanSanitizer.sanitize(req, raw);
     }
 }
