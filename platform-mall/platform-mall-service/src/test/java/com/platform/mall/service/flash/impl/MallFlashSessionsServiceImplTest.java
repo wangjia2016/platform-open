@@ -16,6 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class MallFlashSessionsServiceImplTest {
@@ -92,6 +94,9 @@ class MallFlashSessionsServiceImplTest {
         when(sessionsGoodsMapper.selectOne(any())).thenReturn(
                 MallFlashSessionsGoods.builder().sessionsId(1L).goodsId(10L).build());
         assertDoesNotThrow(() -> service.validateSessionForOrder(1L, 10L));
+        assertDoesNotThrow(() -> service.validateSessionForOrder(1L, 10L));
+        verify(sessionsMapper, times(1)).selectById(1L);
+        verify(sessionsGoodsMapper, times(1)).selectOne(any());
     }
 
     private static MallFlashSessions ongoingSession(int enable) {

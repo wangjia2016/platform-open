@@ -11,6 +11,9 @@ class GoodsStockCacheTest {
     void deductScriptIsAtomicDecrement() {
         assertTrue(GoodsStockCache.DEDUCT_LUA.contains("DECRBY"));
         assertTrue(GoodsStockCache.DEDUCT_LUA.contains("stock < num"));
+        assertTrue(GoodsStockCache.DEDUCT_LUA.contains("EXPIRE"));
+        assertTrue(GoodsStockCache.RESTORE_LUA.contains("EXISTS"));
+        assertTrue(GoodsStockCache.RESTORE_LUA.contains("INCRBY"));
     }
 
     @Test

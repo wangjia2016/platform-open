@@ -12,6 +12,7 @@ import com.platform.common.util.JsonUtil;
 import com.platform.common.util.SnowFlakeIdGenerator;
 import com.platform.mall.dao.basic.MallOrderStatusConstant;
 import com.platform.mall.dao.basic.NotifyManagerDto;
+import com.platform.mall.dao.goods.entity.MallGoods;
 import com.platform.mall.dao.goods.mapper.MallGoodsMapper;
 import com.platform.mall.dao.goods.model.detail.MallGoodsDetailDto;
 import com.platform.mall.dao.order.convert.MallOrderConverter;
@@ -221,6 +222,10 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 throw new BusinessException("商品为空,下单失败");
             }
             Integer stock = goodsStockCache.getStock(goodsId);
+            if (stock == null && mallGoods.getStock() != null) {
+                goodsStockCache.setStockIfAbsent(goodsId, mallGoods.getStock());
+                stock = goodsStockCache.getStock(goodsId);
+            }
             if (stock == null || number == null || stock <= 0 || number > stock) {
                 log.info("商品{},库存不足,下单失败", mallCartRequestQuery.getGoodsName());
                 return false;
@@ -348,7 +353,11 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (left != -2L) {
             return left;
         }
-        mallGoodsCacheManager.getMallGoods(goodsId);
+        MallGoods goods = mallGoodsMapper.selectById(goodsId);
+        if (goods == null || goods.getStock() == null) {
+            return -2L;
+        }
+        goodsStockCache.setStockIfAbsent(goodsId, goods.getStock());
         return goodsStockCache.tryDeduct(goodsId, num);
     }
 
@@ -374,9 +383,8 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (mallGoods.getIsDelete() != null && mallGoods.getIsDelete() == 1) {
             throw new BusinessException("商品已删除,下单失败");
         }
-        Integer stock = goodsStockCache.getStock(mallGoods.getId());
-        if (stock == null || stock <= 0 || number > stock) {
-            throw new InsufficientStockException("商品合法性校验-商品库存不足,goodsId=" + mallGoods.getId());
+        if (number == null || number <= 0) {
+            throw new BusinessException("下单必要参数[number]非法,下单失败");
         }
         return mallGoods;
     }

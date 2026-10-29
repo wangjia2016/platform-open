@@ -8,19 +8,21 @@ import com.platform.mall.dao.goods.entity.MallGoods;
 import com.platform.mall.dao.goods.mapper.MallGoodsMapper;
 import com.platform.mall.dao.goods.model.detail.MallGoodsDetailDto;
 import com.platform.mall.dao.goods.model.query.MallGoodsQuery;
+import com.platform.mall.manager.cache.GoodsDetailLocalCache;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.manager.cache.MallGoodsCacheManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.RedisStringCommands.SetOption;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,7 +41,15 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
 
     private final GoodsStockCache goodsStockCache;
 
-    private final ConcurrentHashMap<Long, Object> loadLocks = new ConcurrentHashMap<>();
+    private final GoodsDetailLocalCache localCache = new GoodsDetailLocalCache(2048);
+
+    private final Object[] loadStripes = new Object[64];
+
+    {
+        for (int i = 0; i < loadStripes.length; i++) {
+            loadStripes[i] = new Object();
+        }
+    }
 
     @Override
     public Boolean mallGoodsCache() {
@@ -64,15 +74,21 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
 
     @Override
     public MallGoodsDetailDto getMallGoods(Long id) {
-        MallGoodsDetailDto cached = readGoods(id);
-        if (cached != null) {
-            seedStockIfAbsent(cached);
-            return cached;
+        if (id == null) {
+            return null;
         }
-        synchronized (loadLocks.computeIfAbsent(id, key -> new Object())) {
-            cached = readGoods(id);
+        MallGoodsDetailDto local = localCache.get(id);
+        if (local != null) {
+            return local;
+        }
+        synchronized (stripe(id)) {
+            local = localCache.get(id);
+            if (local != null) {
+                return local;
+            }
+            MallGoodsDetailDto cached = readGoods(id);
             if (cached != null) {
-                seedStockIfAbsent(cached);
+                localCache.put(id, cached);
                 return cached;
             }
             MallGoods mallGoods = mallGoodsMapper.selectById(id);
@@ -81,7 +97,10 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
             }
             MallGoodsDetailDto detail = MallGoodsConverter.INSTANCE.toDTO(mallGoods);
             writeOne(detail);
-            seedStockIfAbsent(detail);
+            if (detail.getStock() != null) {
+                goodsStockCache.setStockIfAbsent(detail.getId(), detail.getStock());
+            }
+            localCache.put(id, detail);
             return detail;
         }
     }
@@ -93,6 +112,7 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
         if (detail.getStock() != null) {
             goodsStockCache.setStock(detail.getId(), detail.getStock());
         }
+        localCache.put(detail.getId(), detail);
         return true;
     }
 
@@ -100,16 +120,12 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
     public Boolean deleteCache(MallGoodsQuery mallGoods) {
         stringRedisTemplate.delete(goodsKey(mallGoods.getId()));
         goodsStockCache.delete(mallGoods.getId());
+        localCache.invalidate(mallGoods.getId());
         return true;
     }
 
-    private void seedStockIfAbsent(MallGoodsDetailDto detail) {
-        if (detail.getId() == null || detail.getStock() == null) {
-            return;
-        }
-        if (goodsStockCache.getStock(detail.getId()) == null) {
-            goodsStockCache.setStockIfAbsent(detail.getId(), detail.getStock());
-        }
+    private Object stripe(Long id) {
+        return loadStripes[(int) (Math.floorMod(id, loadStripes.length))];
     }
 
     private void writeOne(MallGoodsDetailDto detail) {
@@ -138,7 +154,7 @@ public class MallGoodsCacheManagerImpl implements MallGoodsCacheManager {
         if (mallGoods.getStock() != null) {
             byte[] stockKey = serializer.serialize(goodsStockCache.stockKey(mallGoods.getId()));
             byte[] stockValue = serializer.serialize(String.valueOf(mallGoods.getStock()));
-            connection.setEx(stockKey, GoodsStockCache.TTL_SECONDS, stockValue);
+            connection.set(stockKey, stockValue, Expiration.seconds(GoodsStockCache.TTL_SECONDS), SetOption.ifAbsent());
         }
     }
 

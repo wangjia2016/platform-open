@@ -27,15 +27,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service("mallFlashSessionsService")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsMapper, MallFlashSessions>
         implements MallFlashSessionsService {
 
+    private static final long ORDER_CACHE_TTL_NANOS = TimeUnit.SECONDS.toNanos(5);
+
     private final MallFlashSessionsMapper mallFlashSessionsMapper;
     private final MallFlashSessionsGoodsMapper mallFlashSessionsGoodsMapper;
     private final MallGoodsMapper mallGoodsMapper;
+
+    private final ConcurrentHashMap<Long, CachedSession> sessionCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Long>> bindingCache = new ConcurrentHashMap<>();
 
     @Override
     public List<MallFlashSessionsListDto> listSessions(MallFlashSessionsQuery query) {
@@ -102,6 +109,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         } else {
             mallFlashSessionsMapper.updateById(entity);
         }
+        sessionCache.remove(entity.getId());
         return MallFlashSessionsConverter.INSTANCE.toDTO(entity);
     }
 
@@ -150,6 +158,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
                 .tenantId(StringUtils.isBlank(bindQuery.getTenantId()) ? "0" : bindQuery.getTenantId())
                 .build();
         mallFlashSessionsGoodsMapper.insert(relation);
+        forgetBinding(bindQuery.getSessionsId(), bindQuery.getGoodsId());
         return relation;
     }
 
@@ -159,9 +168,11 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         if (sessionsId == null || goodsId == null) {
             throw new BusinessException("场次id与商品id不能为空");
         }
-        return mallFlashSessionsGoodsMapper.delete(new QueryWrapper<MallFlashSessionsGoods>().lambda()
+        boolean removed = mallFlashSessionsGoodsMapper.delete(new QueryWrapper<MallFlashSessionsGoods>().lambda()
                 .eq(MallFlashSessionsGoods::getSessionsId, sessionsId)
                 .eq(MallFlashSessionsGoods::getGoodsId, goodsId)) > 0;
+        forgetBinding(sessionsId, goodsId);
+        return removed;
     }
 
     @Override
@@ -172,7 +183,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         if (goodsId == null) {
             throw new BusinessException("秒杀下单必要参数[goodsId]为空,下单失败");
         }
-        MallFlashSessions session = mallFlashSessionsMapper.selectById(sessionsId);
+        MallFlashSessions session = loadSession(sessionsId);
         if (session == null) {
             throw new BusinessException("秒杀场次不存在,下单失败");
         }
@@ -186,12 +197,64 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         if (status == FlashSessionStatus.ENDED) {
             throw new BusinessException("秒杀场次已结束,下单失败");
         }
+        if (!isBound(sessionsId, goodsId)) {
+            throw new BusinessException("商品未绑定该秒杀场次,下单失败");
+        }
+    }
+
+    private MallFlashSessions loadSession(Long sessionsId) {
+        long now = System.nanoTime();
+        CachedSession cached = sessionCache.get(sessionsId);
+        if (cached != null && cached.expireAt > now) {
+            return cached.session;
+        }
+        MallFlashSessions session = mallFlashSessionsMapper.selectById(sessionsId);
+        if (session != null) {
+            sessionCache.put(sessionsId, new CachedSession(session, now + ORDER_CACHE_TTL_NANOS));
+        }
+        return session;
+    }
+
+    private boolean isBound(Long sessionsId, Long goodsId) {
+        ConcurrentHashMap<Long, Long> goods = bindingCache.computeIfAbsent(sessionsId, key -> new ConcurrentHashMap<>());
+        long now = System.nanoTime();
+        Long expireAt = goods.get(goodsId);
+        if (expireAt != null && expireAt > now) {
+            return true;
+        }
         MallFlashSessionsGoods relation = mallFlashSessionsGoodsMapper.selectOne(
                 new QueryWrapper<MallFlashSessionsGoods>().lambda()
                         .eq(MallFlashSessionsGoods::getSessionsId, sessionsId)
                         .eq(MallFlashSessionsGoods::getGoodsId, goodsId));
         if (relation == null) {
-            throw new BusinessException("商品未绑定该秒杀场次,下单失败");
+            goods.remove(goodsId);
+            return false;
+        }
+        goods.put(goodsId, now + ORDER_CACHE_TTL_NANOS);
+        return true;
+    }
+
+    private void forgetBinding(Long sessionsId, Long goodsId) {
+        if (sessionsId == null) {
+            return;
+        }
+        if (goodsId == null) {
+            bindingCache.remove(sessionsId);
+            return;
+        }
+        ConcurrentHashMap<Long, Long> goods = bindingCache.get(sessionsId);
+        if (goods != null) {
+            goods.remove(goodsId);
+        }
+    }
+
+    private static final class CachedSession {
+        private final MallFlashSessions session;
+        private final long expireAt;
+
+        private CachedSession(MallFlashSessions session, long expireAt) {
+            this.session = session;
+            this.expireAt = expireAt;
         }
     }
 

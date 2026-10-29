@@ -24,19 +24,38 @@ public class GoodsStockCache {
                     + "local stock = tonumber(redis.call('GET', KEYS[1])) "
                     + "if stock == nil then return -2 end "
                     + "if stock < num then return -1 end "
-                    + "return redis.call('DECRBY', KEYS[1], num)";
+                    + "local left = redis.call('DECRBY', KEYS[1], num) "
+                    + "redis.call('EXPIRE', KEYS[1], ARGV[2]) "
+                    + "return left";
+
+    /**
+     * 键不存在时不创建，避免把回补数量当成全部库存。存在时增加并续期。
+     */
+    static final String RESTORE_LUA =
+            "local num = tonumber(ARGV[1]) "
+                    + "if num == nil or num <= 0 then return 0 end "
+                    + "if redis.call('EXISTS', KEYS[1]) == 0 then return 0 end "
+                    + "local left = redis.call('INCRBY', KEYS[1], num) "
+                    + "redis.call('EXPIRE', KEYS[1], ARGV[2]) "
+                    + "return left";
 
     public static final long TTL_SECONDS = 7200L;
 
     private final StringRedisTemplate stringRedisTemplate;
     private final DefaultRedisScript<Long> deductScript;
+    private final DefaultRedisScript<Long> restoreScript;
 
     public GoodsStockCache(StringRedisTemplate stringRedisTemplate) {
         this.stringRedisTemplate = stringRedisTemplate;
+        this.deductScript = script(DEDUCT_LUA);
+        this.restoreScript = script(RESTORE_LUA);
+    }
+
+    private static DefaultRedisScript<Long> script(String text) {
         DefaultRedisScript<Long> script = new DefaultRedisScript<>();
-        script.setScriptText(DEDUCT_LUA);
+        script.setScriptText(text);
         script.setResultType(Long.class);
-        this.deductScript = script;
+        return script;
     }
 
     public static long apply(Integer current, int num) {
@@ -60,7 +79,8 @@ public class GoodsStockCache {
         Long result = stringRedisTemplate.execute(
                 deductScript,
                 Collections.singletonList(stockKey(goodsId)),
-                String.valueOf(num));
+                String.valueOf(num),
+                String.valueOf(TTL_SECONDS));
         return result == null ? -2L : result;
     }
 
@@ -68,7 +88,11 @@ public class GoodsStockCache {
         if (goodsId == null || num <= 0) {
             return;
         }
-        stringRedisTemplate.opsForValue().increment(stockKey(goodsId), num);
+        stringRedisTemplate.execute(
+                restoreScript,
+                Collections.singletonList(stockKey(goodsId)),
+                String.valueOf(num),
+                String.valueOf(TTL_SECONDS));
     }
 
     public void setStock(Long goodsId, int stock) {
