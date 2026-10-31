@@ -3,8 +3,6 @@ package com.platform.mall.service.order.impl;
 import com.platform.common.exception.BusinessException;
 import com.platform.common.exception.InsufficientStockException;
 import com.platform.common.util.JsonUtil;
-import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
-import com.platform.mall.dao.order.model.query.MallOrderQuery;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.service.order.MallOrderService;
@@ -30,10 +28,7 @@ public class CreateOrderMessageHandler {
         if (request == null || request.getOrderId() == null) {
             throw new BusinessException("创建订单消息缺少 orderId");
         }
-        MallOrderDetailDto existing = mallOrderService.getOne(MallOrderQuery.builder()
-                .id(request.getOrderId())
-                .build());
-        if (existing != null) {
+        if (mallOrderService.orderExists(request.getOrderId())) {
             log.info("订单已创建,忽略重复消息,orderId={}", request.getOrderId());
             return;
         }

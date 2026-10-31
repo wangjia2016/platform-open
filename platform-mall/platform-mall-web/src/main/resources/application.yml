@@ -7,8 +7,8 @@ spring:
       # mysql-connector >= 6.x: com.mysql.cj.jdbc.Driver
       # mysql-connector <= 5.x: com.mysql.jdbc.Driver
       driver-class-name: com.mysql.cj.jdbc.Driver
-      #连接池最大连接数 默认10
-      maximum-pool-size: 10
+      # 要盖住下单消费线程，并给支付、取消和页面请求留余量
+      maximum-pool-size: 32
       ## 空闲连接存活最大时间，默认600000（10分钟）
       idle-timeout: 600000
   cloud:
@@ -31,7 +31,7 @@ server:
 #设置日志级别
 logging:
   level:
-    com.platform: debug
+    com.platform: info
   config: classpath:config/logback-spring.xml
   file:
     path: /data/logs
@@ -45,7 +45,7 @@ rocketmq:
   name-server: ${ROCKETMQ_NAME_SERVER:localhost:9876}
   producer:
     group: mall-producer-group
-    send-message-timeout: 10000
+    send-message-timeout: 3000
 
 #spring:
 #    application:
@@ -53,7 +53,7 @@ rocketmq:
 redis:
   host: ${REDIS_HOST:localhost}
   port: ${REDIS_PORT:6379}
-  timeout: 20000
+  timeout: 2000
   password: ${REDIS_PASSWORD:}
   database: ${REDIS_DATABASE:9}
   #        cluster:
@@ -70,7 +70,7 @@ redisson:
   address:  ${REDISSON_ADDRESS:redis://localhost:6379}
   password: ${REDIS_PASSWORD:}
   database: ${REDIS_DATABASE:9}
-  timeout: 5000
+  timeout: 2000
   connectionPoolSize: 100
 
 mall:

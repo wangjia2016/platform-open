@@ -27,6 +27,11 @@ public interface MallOrderService extends IService<MallOrder> {
     MallOrderDetailDto getOne(MallOrderQuery mallOrderQuery);
 
     /**
+     * 只判断主键是否已有订单，供下单消息去重，不装载整行。
+     */
+    boolean orderExists(Long orderId);
+
+    /**
      * @Description 根据MallOrderDto查询一条MallOrder记录
      * @Param MallOrderDto
      * @return

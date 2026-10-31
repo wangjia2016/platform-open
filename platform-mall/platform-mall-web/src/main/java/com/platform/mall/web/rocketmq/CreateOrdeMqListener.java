@@ -31,5 +31,8 @@ public class CreateOrdeMqListener implements RocketMQListener<String>, RocketMQP
     public void prepareStart(DefaultMQPushConsumer consumer) {
         consumer.setPullInterval(0);
         consumer.setPullBatchSize(32);
+        // 同一商品的库存行锁扛不住过多并发更新，线程过多只会占着数据库连接空等。
+        consumer.setConsumeThreadMin(4);
+        consumer.setConsumeThreadMax(16);
     }
 }

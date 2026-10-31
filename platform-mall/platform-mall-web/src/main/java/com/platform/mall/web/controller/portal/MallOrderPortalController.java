@@ -54,16 +54,16 @@ public class MallOrderPortalController {
     @CheckAuthentication
     @CheckIdempotent(true)
     @SentinelResource(value = OrderSentinelConfiguration.CREATE_ORDER_RESOURCE, blockHandler = "createOrderBlocked")
-    public Result<MallOrderDetailDto> createOrder(@Valid @RequestBody MallOrderRequestQuery mallOrderRequest) {
+    public Result<Long> createOrder(@Valid @RequestBody MallOrderRequestQuery mallOrderRequest) {
         mallOrderRequest.setMemberId(CurrentMember.requireId());
         final Boolean result = mallOrderService.preCreateOrder(mallOrderRequest);
-        if (result) {
-            return Result.success("您的订单处理中，请稍后支付");
+        if (Boolean.TRUE.equals(result)) {
+            return Result.success(mallOrderRequest.getOrderId(), "您的订单处理中，请稍后支付");
         }
         return Result.fail("下单异常");
     }
 
-    public Result<MallOrderDetailDto> createOrderBlocked(MallOrderRequestQuery mallOrderRequest, BlockException ex) {
+    public Result<Long> createOrderBlocked(MallOrderRequestQuery mallOrderRequest, BlockException ex) {
         log.warn("下单被限流,{}", ex.getMessage());
         return Result.fail("当前下单人数过多，请稍后再试");
     }

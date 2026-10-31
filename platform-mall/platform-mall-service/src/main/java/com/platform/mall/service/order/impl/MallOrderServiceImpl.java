@@ -7,6 +7,9 @@ import com.platform.common.enums.OrderStatusEnum;
 import com.platform.common.exception.BusinessException;
 import com.platform.common.exception.InsufficientStockException;
 import com.platform.common.result.Result;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.common.util.DateTimeUtil;
 import com.platform.common.util.JsonUtil;
 import com.platform.common.util.SnowFlakeIdGenerator;
@@ -42,6 +45,7 @@ import com.platform.mall.service.order.MallOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
@@ -56,6 +60,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author Administrator
@@ -64,6 +69,11 @@ import java.util.List;
 @Service("mallOrderService")
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder> implements MallOrderService {
+
+    private static final ObjectMapper FLASH_JSON = new ObjectMapper()
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+    private static final long SEND_TIMEOUT_MS = 3000L;
 
     public final MallOrderItemMapper mallOrderItemMapper;
 
@@ -99,6 +109,16 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 .eq(StringUtils.isNotBlank(mallOrderQuery.getTenantId()), MallOrder::getTenantId, mallOrderQuery.getTenantId()),
                 false);
         return MallOrderConverter.INSTANCE.toDTO(mallOrder);
+    }
+
+    @Override
+    public boolean orderExists(Long orderId) {
+        if (orderId == null) {
+            return false;
+        }
+        Integer count = mallOrderMapper.selectCount(new QueryWrapper<MallOrder>().lambda()
+                .eq(MallOrder::getId, orderId));
+        return count != null && count > 0;
     }
 
     @Override
@@ -176,11 +196,23 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
     private void sendDelay(String destination, Long orderId, int delayLevel) {
         try {
-            SendResult sendResult = rocketMQTemplate.syncSend(destination,
+            rocketMQTemplate.asyncSend(destination,
                     MessageBuilder.withPayload(orderId).setHeader(RocketMQHeaders.KEYS, orderId).build(),
-                    5000, delayLevel);
-            log.info("延时消息已发送 destination={} delayLevel={} result={}", destination, delayLevel, sendResult);
-        } catch (Exception ex) {
+                    new SendCallback() {
+                        @Override
+                        public void onSuccess(SendResult sendResult) {
+                            if (log.isDebugEnabled()) {
+                                log.debug("延时消息已发送 destination={} delayLevel={} result={}", destination, delayLevel, sendResult);
+                            }
+                        }
+
+                        @Override
+                        public void onException(Throwable ex) {
+                            log.error("延时消息发送失败 destination={} orderId={}", destination, orderId, ex);
+                        }
+                    },
+                    SEND_TIMEOUT_MS, delayLevel);
+        } catch (RuntimeException ex) {
             log.error("延时消息发送失败 destination={} orderId={}", destination, orderId, ex);
         }
     }
@@ -331,20 +363,49 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         }
         Long orderId = snowFlakeIdGenerator.nextId();
         mallOrderFlashRequestQuery.setOrderId(orderId);
-        try {
-            SendResult sendResult = rocketMQTemplate.syncSend(MallOrderMq.CREATE_FLASH_DESTINATION,
-                    MessageBuilder.withPayload(JsonUtil.object2Json(mallOrderFlashRequestQuery))
-                            .setHeader(RocketMQHeaders.KEYS, orderId).build());
-            log.info("秒杀下单消息发送结果:{}", sendResult);
-            if (sendResult != null && SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
-                return true;
+        AtomicBoolean restored = new AtomicBoolean(false);
+        Runnable restoreOnce = () -> {
+            if (restored.compareAndSet(false, true)) {
+                goodsStockCache.restore(goodsId, num);
             }
-            goodsStockCache.restore(goodsId, num);
-            return false;
+        };
+        try {
+            rocketMQTemplate.asyncSend(MallOrderMq.CREATE_FLASH_DESTINATION,
+                    MessageBuilder.withPayload(flashJson(mallOrderFlashRequestQuery))
+                            .setHeader(RocketMQHeaders.KEYS, orderId).build(),
+                    new SendCallback() {
+                        @Override
+                        public void onSuccess(SendResult sendResult) {
+                            if (sendResult != null && SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+                                return;
+                            }
+                            log.error("秒杀下单消息未被接收,已回补库存,orderId={}", orderId);
+                            restoreOnce.run();
+                        }
+
+                        @Override
+                        public void onException(Throwable ex) {
+                            log.error("秒杀下单消息发送失败,已回补库存,orderId={}", orderId, ex);
+                            restoreOnce.run();
+                        }
+                    },
+                    SEND_TIMEOUT_MS);
         } catch (RuntimeException ex) {
-            goodsStockCache.restore(goodsId, num);
+            restoreOnce.run();
             log.error("秒杀下单消息发送失败,已回补库存,goodsId={}", goodsId, ex);
             throw new BusinessException("下单消息发送失败");
+        }
+        if (restored.get()) {
+            throw new BusinessException("下单消息发送失败");
+        }
+        return true;
+    }
+
+    private static String flashJson(MallOrderRequestQuery request) {
+        try {
+            return FLASH_JSON.writeValueAsString(request);
+        } catch (JsonProcessingException ex) {
+            throw new IllegalStateException("下单消息序列化失败", ex);
         }
     }
 

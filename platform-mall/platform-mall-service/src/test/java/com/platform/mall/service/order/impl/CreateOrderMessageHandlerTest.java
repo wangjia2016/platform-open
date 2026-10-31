@@ -3,8 +3,6 @@ package com.platform.mall.service.order.impl;
 import com.platform.common.exception.BusinessException;
 import com.platform.common.exception.InsufficientStockException;
 import com.platform.common.util.JsonUtil;
-import com.platform.mall.dao.order.model.detail.MallOrderDetailDto;
-import com.platform.mall.dao.order.model.query.MallOrderQuery;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.service.order.MallOrderService;
@@ -24,7 +22,7 @@ class CreateOrderMessageHandlerTest {
     void duplicateMessageDoesNotCreateAgain() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.getOne(any(MallOrderQuery.class))).thenReturn(new MallOrderDetailDto());
+        when(orders.orderExists(11L)).thenReturn(true);
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 
         handler.onMessage(payload(11L, 22L, 1));
@@ -37,7 +35,7 @@ class CreateOrderMessageHandlerTest {
     void insufficientStockRestoresReservationAndAcks() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.getOne(any(MallOrderQuery.class))).thenReturn(null);
+        when(orders.orderExists(11L)).thenReturn(false);
         when(orders.createOrder(any())).thenThrow(new InsufficientStockException("库存不足"));
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 
@@ -50,7 +48,7 @@ class CreateOrderMessageHandlerTest {
     void otherFailuresAreRetried() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.getOne(any(MallOrderQuery.class))).thenReturn(null);
+        when(orders.orderExists(11L)).thenReturn(false);
         when(orders.createOrder(any())).thenThrow(new BusinessException("数据库不可用"));
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 
