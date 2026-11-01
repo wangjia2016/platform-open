@@ -36,6 +36,8 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         implements MallFlashSessionsService {
 
     private static final long ORDER_CACHE_TTL_NANOS = TimeUnit.SECONDS.toNanos(5);
+    private static final long PAGE_CACHE_NANOS = TimeUnit.SECONDS.toNanos(5);
+    private static final int PAGE_CACHE_MAX = 128;
 
     private final MallFlashSessionsMapper mallFlashSessionsMapper;
     private final MallFlashSessionsGoodsMapper mallFlashSessionsGoodsMapper;
@@ -43,11 +45,20 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
 
     private final ConcurrentHashMap<Long, CachedSession> sessionCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Long, ConcurrentHashMap<Long, Long>> bindingCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, TimedPage<MallFlashSessionsListDto>> sessionListCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, TimedPage<MallFlashSessionsGoodsListDto>> sessionGoodsCache = new ConcurrentHashMap<>();
 
     @Override
     public List<MallFlashSessionsListDto> listSessions(MallFlashSessionsQuery query) {
         if (query == null) {
             query = new MallFlashSessionsQuery();
+        }
+        String cacheKey = listKey(query);
+        TimedPage<MallFlashSessionsListDto> cached = sessionListCache.get(cacheKey);
+        long nowNano = System.nanoTime();
+        if (cached != null && cached.expireAt > nowNano) {
+            fillCountdown(cached.value);
+            return cached.value;
         }
         LambdaQueryWrapper<MallFlashSessions> wrapper = new QueryWrapper<MallFlashSessions>().lambda()
                 .eq(query.getId() != null, MallFlashSessions::getId, query.getId())
@@ -59,12 +70,22 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
                 .orderByAsc(MallFlashSessions::getStartTime);
         List<MallFlashSessions> sessions = mallFlashSessionsMapper.selectList(wrapper);
         List<MallFlashSessionsListDto> list = MallFlashSessionsConverter.INSTANCE.toListDTO(sessions);
+        fillCountdown(list);
+        rememberPage(sessionListCache, cacheKey, list, nowNano);
+        return list;
+    }
+
+    private static void fillCountdown(List<MallFlashSessionsListDto> list) {
         Date now = new Date();
         for (MallFlashSessionsListDto dto : list) {
             dto.setStatus(FlashSessionStatus.resolve(dto.getStartTime(), dto.getEndTime(), now));
             dto.setCountdownSeconds(FlashSessionStatus.countdownSeconds(dto.getStartTime(), dto.getEndTime(), now));
         }
-        return list;
+    }
+
+    private static String listKey(MallFlashSessionsQuery query) {
+        return query.getId() + "|" + query.getFlashPromotionId() + "|" + query.getIsEnable()
+                + "|" + query.getTenantId() + "|" + query.getName();
     }
 
     @Override
@@ -110,6 +131,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
             mallFlashSessionsMapper.updateById(entity);
         }
         sessionCache.remove(entity.getId());
+        forgetPages();
         return MallFlashSessionsConverter.INSTANCE.toDTO(entity);
     }
 
@@ -118,8 +140,15 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         if (sessionsId == null) {
             throw new BusinessException("场次id不能为空");
         }
+        TimedPage<MallFlashSessionsGoodsListDto> cached = sessionGoodsCache.get(sessionsId);
+        long nowNano = System.nanoTime();
+        if (cached != null && cached.expireAt > nowNano) {
+            return cached.value;
+        }
         List<MallFlashSessionsGoodsListDto> goods = mallFlashSessionsGoodsMapper.listGoodsBySessionsId(sessionsId);
-        return goods == null ? Collections.emptyList() : goods;
+        List<MallFlashSessionsGoodsListDto> list = goods == null ? Collections.emptyList() : goods;
+        rememberPage(sessionGoodsCache, sessionsId, list, nowNano);
+        return list;
     }
 
     @Override
@@ -159,6 +188,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
                 .build();
         mallFlashSessionsGoodsMapper.insert(relation);
         forgetBinding(bindQuery.getSessionsId(), bindQuery.getGoodsId());
+        forgetPages();
         return relation;
     }
 
@@ -172,6 +202,7 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
                 .eq(MallFlashSessionsGoods::getSessionsId, sessionsId)
                 .eq(MallFlashSessionsGoods::getGoodsId, goodsId)) > 0;
         forgetBinding(sessionsId, goodsId);
+        forgetPages();
         return removed;
     }
 
@@ -199,6 +230,28 @@ public class MallFlashSessionsServiceImpl extends ServiceImpl<MallFlashSessionsM
         }
         if (!isBound(sessionsId, goodsId)) {
             throw new BusinessException("商品未绑定该秒杀场次,下单失败");
+        }
+    }
+
+    private void forgetPages() {
+        sessionListCache.clear();
+        sessionGoodsCache.clear();
+    }
+
+    private <K, T> void rememberPage(ConcurrentHashMap<K, TimedPage<T>> cache, K key, List<T> value, long nowNano) {
+        if (cache.size() >= PAGE_CACHE_MAX && !cache.containsKey(key)) {
+            return;
+        }
+        cache.put(key, new TimedPage<>(value, nowNano + PAGE_CACHE_NANOS));
+    }
+
+    private static final class TimedPage<T> {
+        private final List<T> value;
+        private final long expireAt;
+
+        private TimedPage(List<T> value, long expireAt) {
+            this.value = value;
+            this.expireAt = expireAt;
         }
     }
 

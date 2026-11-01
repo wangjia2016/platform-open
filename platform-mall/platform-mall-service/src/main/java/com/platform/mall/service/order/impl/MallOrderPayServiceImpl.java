@@ -110,7 +110,7 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
             log.info("支付回调并发重复,orderNo={}", mallOrder.getOrderNo());
             return true;
         }
-        orderStatusCache.markStatus(mallOrder.getId(), mallOrder.getMemberId(), mallOrder.getOrderStatus());
+        orderStatusCache.markStatus(mallOrder.getId(), mallOrder.getMemberId(), mallOrder.getOrderStatus(), mallOrder.getOrderNo());
         mallOrderService.asyncMsgProcess(mallOrder);
         return true;
     }

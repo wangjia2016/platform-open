@@ -21,6 +21,15 @@ class OrderStatusCacheTest {
         OrderStatusCache.Snapshot snapshot = OrderStatusCache.parse("7:1");
         assertEquals(7L, snapshot.getMemberId());
         assertEquals(1, snapshot.getStatus());
+        assertNull(snapshot.getOrderNo());
+    }
+
+    @Test
+    void statusSnapshotKeepsOrderNo() {
+        OrderStatusCache.Snapshot snapshot = OrderStatusCache.parse("7:1:900");
+        assertEquals(7L, snapshot.getMemberId());
+        assertEquals(1, snapshot.getStatus());
+        assertEquals(900L, snapshot.getOrderNo());
     }
 
     @Test

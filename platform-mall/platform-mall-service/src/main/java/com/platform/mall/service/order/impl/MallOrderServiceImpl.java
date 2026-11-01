@@ -149,7 +149,7 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
             if (!memberId.equals(snapshot.getMemberId())) {
                 return null;
             }
-            return lightStatus(id, null, snapshot.getStatus());
+            return lightStatus(id, snapshot.getOrderNo(), snapshot.getStatus());
         }
         MallOrder mallOrder = mallOrderMapper.selectOne(new QueryWrapper<MallOrder>()
                 .select("id", "member_id", "order_status", "order_no")
@@ -157,7 +157,7 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (mallOrder == null || !memberId.equals(mallOrder.getMemberId())) {
             return null;
         }
-        orderStatusCache.markStatus(id, memberId, mallOrder.getOrderStatus());
+        orderStatusCache.markStatus(id, memberId, mallOrder.getOrderStatus(), mallOrder.getOrderNo());
         return lightStatus(id, mallOrder.getOrderNo(), mallOrder.getOrderStatus());
     }
 
@@ -214,15 +214,15 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (updated == null || updated == 0) {
             throw new InsufficientStockException("商品库存不足,goodsId=" + goodsId);
         }
-        scheduleAfterCommit(orderId, mallOrder.getMemberId());
+        scheduleAfterCommit(orderId, mallOrder.getMemberId(), orderNo);
         return true;
     }
 
-    private void scheduleAfterCommit(Long orderId, Long memberId) {
+    private void scheduleAfterCommit(Long orderId, Long memberId, Long orderNo) {
         Runnable committed = () -> {
             sendOrderTimers(orderId);
             if (memberId != null) {
-                orderStatusCache.markStatus(orderId, memberId, MallOrderStatusConstant.TO_PAY.getTypeValue());
+                orderStatusCache.markStatus(orderId, memberId, MallOrderStatusConstant.TO_PAY.getTypeValue(), orderNo);
             }
         };
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
@@ -347,12 +347,12 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         List<MallOrderItem> items = mallOrderItemMapper.selectList(new QueryWrapper<MallOrderItem>().lambda()
                 .eq(MallOrderItem::getOrderId, id));
         restoreCacheAfterCommit(items);
-        publishStatus(id, mallOrder.getMemberId(), MallOrderStatusConstant.TRADE_CLOSED.getTypeValue());
+        publishStatus(id, mallOrder.getMemberId(), MallOrderStatusConstant.TRADE_CLOSED.getTypeValue(), mallOrder.getOrderNo());
         return Result.success("取消成功");
     }
 
-    private void publishStatus(Long orderId, Long memberId, int status) {
-        Runnable publish = () -> orderStatusCache.markStatus(orderId, memberId, status);
+    private void publishStatus(Long orderId, Long memberId, int status, Long orderNo) {
+        Runnable publish = () -> orderStatusCache.markStatus(orderId, memberId, status, orderNo);
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
