@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,6 +35,13 @@ public class JwtOperator {
     private Long expirationTimeInSecond;
 
     /**
+     * 同一次请求里拦截器和认证切面共用解析结果，避免重复做 HMAC。
+     */
+    public static final String REQUEST_CLAIMS = "jwtClaims";
+
+    private volatile SecretKey signingKey;
+
+    /**
      * 从token中获取claim
      *
      * @param token token
@@ -42,7 +50,7 @@ public class JwtOperator {
     public Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parser()
-                .setSigningKey(this.secret.getBytes())
+                .setSigningKey(signingKey())
                 .parseClaimsJws(token)
                 .getBody();
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException
@@ -94,15 +102,12 @@ public class JwtOperator {
         Date expirationTime = this.getExpirationTime();
 
 
-        byte[] keyBytes = secret.getBytes();
-        SecretKey key = Keys.hmacShaKeyFor(keyBytes);
-
         return Jwts.builder()
             .setClaims(claims)
             .setIssuedAt(createdTime)
             .setExpiration(expirationTime)
             // 支持的算法详见：https://github.com/jwtk/jjwt#features
-            .signWith(key, SignatureAlgorithm.HS256)
+            .signWith(signingKey(), SignatureAlgorithm.HS256)
             .compact();
     }
 
@@ -114,6 +119,19 @@ public class JwtOperator {
      */
     public Boolean validateToken(String token) {
         return !isTokenExpired(token);
+    }
+
+    private SecretKey signingKey() {
+        SecretKey local = this.signingKey;
+        if (local != null) {
+            return local;
+        }
+        synchronized (this) {
+            if (this.signingKey == null) {
+                this.signingKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+            }
+            return this.signingKey;
+        }
     }
 
 }

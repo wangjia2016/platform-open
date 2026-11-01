@@ -128,7 +128,8 @@ CREATE TABLE `mall_order`  (
   `update_datetime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `tenant_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '租户id',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `AK_un_order_no`(`order_no`) USING BTREE
+  UNIQUE INDEX `AK_un_order_no`(`order_no`) USING BTREE,
+  INDEX `idx_member_id`(`member_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -157,7 +158,8 @@ CREATE TABLE `mall_order_delivery`  (
   `update_user` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '修改人',
   `update_datetime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `tenant_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '租户id',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_order_id`(`order_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '订单物流信息' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -189,7 +191,9 @@ CREATE TABLE `mall_order_item`  (
   `update_user` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '修改人',
   `update_datetime` datetime(0) NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0) COMMENT '修改时间',
   `tenant_id` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '0' COMMENT '租户id',
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_order_id`(`order_id`) USING BTREE,
+  INDEX `idx_order_no`(`order_no`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '订单项，订单包含的商品、订单详情' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

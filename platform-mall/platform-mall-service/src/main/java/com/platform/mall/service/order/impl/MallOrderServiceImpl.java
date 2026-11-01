@@ -51,6 +51,7 @@ import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.rocketmq.spring.support.RocketMQHeaders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -143,12 +144,21 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         final Long goodsId = mallOrderFlashRequestQuery.getGoodsId();
         final Integer number = mallOrderFlashRequestQuery.getNumber();
 
-        Integer updated = mallGoodsMapper.updateGoodsStock(goodsId, number);
-        if (updated == null || updated == 0) {
-            throw new InsufficientStockException("商品库存不足,goodsId=" + goodsId);
+        final MallOrder mallOrder = MallOrderConverter.INSTANCE.fromMallOrderFlashRequestQuery(mallOrderFlashRequestQuery);
+        mallOrder.setId(orderId);
+        mallOrder.setOrderNo(orderNo);
+        mallOrder.setOrderStatus(MallOrderStatusConstant.TO_PAY.getTypeValue());
+        mallOrder.setSessionsId(mallOrderFlashRequestQuery.getSessionsId());
+        mallOrder.setBusinessType(2);
+        try {
+            if (mallOrderMapper.insert(mallOrder) <= 0) {
+                return false;
+            }
+        } catch (DuplicateKeyException ex) {
+            log.info("订单已创建,忽略重复消息,orderId={}", orderId);
+            return true;
         }
 
-        final MallOrder mallOrder = MallOrderConverter.INSTANCE.fromMallOrderFlashRequestQuery(mallOrderFlashRequestQuery);
         MallOrderItem mallOrderItem = MallOrderItem.builder()
                 .appId(mallOrderFlashRequestQuery.getAppId())
                 .openid(mallOrderFlashRequestQuery.getOpenid())
@@ -160,20 +170,19 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                 .distributorId(mallOrderFlashRequestQuery.getDistributorId())
                 .tenantId(mallOrderFlashRequestQuery.getTenantId()).build();
         mallOrderItemMapper.insert(mallOrderItem);
-        mallOrder.setId(orderId);
-        mallOrder.setOrderNo(orderNo);
-        mallOrder.setOrderStatus(MallOrderStatusConstant.TO_PAY.getTypeValue());
-        mallOrder.setSessionsId(mallOrderFlashRequestQuery.getSessionsId());
         if (mallOrderFlashRequestQuery.getDeliveryType() != null && mallOrderFlashRequestQuery.getDeliveryType() == 1) {
             final MallOrderDelivery mallOrderDelivery = MallOrderDeliveryConverter.INSTANCE.fromMallOrderFlashRequestQuery(mallOrderFlashRequestQuery);
             mallOrderDelivery.setOrderId(orderId);
             mallOrderDelivery.setOrderNo(orderNo);
             mallOrderDeliveryMapper.insert(mallOrderDelivery);
         }
-        mallOrder.setBusinessType(2);
-        int insert = mallOrderMapper.insert(mallOrder);
+
+        Integer updated = mallGoodsMapper.updateGoodsStock(goodsId, number);
+        if (updated == null || updated == 0) {
+            throw new InsufficientStockException("商品库存不足,goodsId=" + goodsId);
+        }
         scheduleAfterCommit(orderId);
-        return insert > 0;
+        return true;
     }
 
     private void scheduleAfterCommit(Long orderId) {

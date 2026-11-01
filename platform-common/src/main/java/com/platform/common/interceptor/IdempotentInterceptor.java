@@ -49,11 +49,23 @@ public class IdempotentInterceptor implements HandlerInterceptor {
         if (StringUtils.isBlank(auth)) {
             throw new SecurityException("Token不能为空！");
         }
-        Claims claims = jwtOperator.getClaimsFromToken(auth);
+        Claims claims = cachedClaims(request);
+        if (claims == null) {
+            claims = jwtOperator.getClaimsFromToken(auth);
+            request.setAttribute(JwtOperator.REQUEST_CLAIMS, claims);
+        }
         Object memberId = claims.get("id");
         if (memberId == null) {
             throw new SecurityException("Token不合法！");
         }
         return Boolean.TRUE.equals(stringRedisTemplate.delete(IdempotentKeys.key(memberId, token)));
+    }
+
+    private Claims cachedClaims(HttpServletRequest request) {
+        Object cached = request.getAttribute(JwtOperator.REQUEST_CLAIMS);
+        if (cached instanceof Claims) {
+            return (Claims) cached;
+        }
+        return null;
     }
 }

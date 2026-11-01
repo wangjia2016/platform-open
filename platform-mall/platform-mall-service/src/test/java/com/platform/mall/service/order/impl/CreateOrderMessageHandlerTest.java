@@ -19,15 +19,15 @@ import static org.mockito.Mockito.when;
 class CreateOrderMessageHandlerTest {
 
     @Test
-    void duplicateMessageDoesNotCreateAgain() {
+    void duplicateCreateIsAckedWithoutRestoringStock() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.orderExists(11L)).thenReturn(true);
+        when(orders.createOrder(any())).thenReturn(true);
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 
         handler.onMessage(payload(11L, 22L, 1));
 
-        verify(orders, never()).createOrder(any());
+        verify(orders).createOrder(any());
         verify(stock, never()).restore(any(), anyInt());
     }
 
@@ -35,7 +35,6 @@ class CreateOrderMessageHandlerTest {
     void insufficientStockRestoresReservationAndAcks() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.orderExists(11L)).thenReturn(false);
         when(orders.createOrder(any())).thenThrow(new InsufficientStockException("库存不足"));
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 
@@ -48,7 +47,6 @@ class CreateOrderMessageHandlerTest {
     void otherFailuresAreRetried() {
         MallOrderService orders = mock(MallOrderService.class);
         GoodsStockCache stock = mock(GoodsStockCache.class);
-        when(orders.orderExists(11L)).thenReturn(false);
         when(orders.createOrder(any())).thenThrow(new BusinessException("数据库不可用"));
         CreateOrderMessageHandler handler = new CreateOrderMessageHandler(orders, stock);
 

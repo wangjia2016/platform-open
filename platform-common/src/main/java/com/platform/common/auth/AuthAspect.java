@@ -45,12 +45,11 @@ public class AuthAspect {
                 throw new SecurityException("Token不能为空！");
             }
             // 2. 校验token是否合法&是否过期；如果不合法或已过期直接抛异常；如果合法放行
-            Boolean isValid = jwtOperator.validateToken(token);
-            if (!isValid) {
-                throw new SecurityException("Token不合法！");
+            Claims claims = cachedClaims(request);
+            if (claims == null) {
+                claims = jwtOperator.getClaimsFromToken(token);
+                request.setAttribute(JwtOperator.REQUEST_CLAIMS, claims);
             }
-            // 3. 如果校验成功，那么就将用户的信息设置到request的attribute里面
-            Claims claims = jwtOperator.getClaimsFromToken(token);
             request.setAttribute("id", claims.get("id"));
             request.setAttribute("wxNickname", claims.get("wxNickname"));
         final Object tenantId = claims.get("tenantId");
@@ -62,6 +61,14 @@ public class AuthAspect {
 //        } catch (Throwable throwable) {
 //            throw new SecurityException("Token不合法");
 //        }
+    }
+
+    private Claims cachedClaims(HttpServletRequest request) {
+        Object cached = request.getAttribute(JwtOperator.REQUEST_CLAIMS);
+        if (cached instanceof Claims) {
+            return (Claims) cached;
+        }
+        return null;
     }
 
     private HttpServletRequest getHttpServletRequest() {

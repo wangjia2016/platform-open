@@ -28,10 +28,6 @@ public class CreateOrderMessageHandler {
         if (request == null || request.getOrderId() == null) {
             throw new BusinessException("创建订单消息缺少 orderId");
         }
-        if (mallOrderService.orderExists(request.getOrderId())) {
-            log.info("订单已创建,忽略重复消息,orderId={}", request.getOrderId());
-            return;
-        }
         try {
             Boolean created = mallOrderService.createOrder(request);
             if (!Boolean.TRUE.equals(created)) {

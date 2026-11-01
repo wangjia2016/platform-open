@@ -9,6 +9,11 @@ spring:
       driver-class-name: com.mysql.cj.jdbc.Driver
       # 要盖住下单消费线程，并给支付、取消和页面请求留余量
       maximum-pool-size: 32
+      connection-timeout: 3000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 256
+        prepStmtCacheSqlLimit: 2048
       ## 空闲连接存活最大时间，默认600000（10分钟）
       idle-timeout: 600000
   cloud:
