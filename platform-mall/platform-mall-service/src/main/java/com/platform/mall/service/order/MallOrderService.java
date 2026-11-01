@@ -41,6 +41,11 @@ public interface MallOrderService extends IService<MallOrder> {
     MallOrderDetailDto orderDetail(Long id, Long memberId);
 
     /**
+     * 轮询用的轻量状态。处理中只有订单号，不含订单项。
+     */
+    MallOrderDetailDto orderStatus(Long id, Long memberId);
+
+    /**
      * @Description 普通-提交订单
      * @Param mallOrderRequestQuery
      * @return

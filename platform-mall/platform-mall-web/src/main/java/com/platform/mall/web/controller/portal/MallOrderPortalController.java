@@ -71,9 +71,12 @@ public class MallOrderPortalController {
     @ApiOperation("订单状态")
     @GetMapping("/orderStatus")
     public Result<MallOrderDetailDto> orderStatus(@RequestParam(value = "id") Long id) {
-        MallOrderDetailDto detail = mallOrderService.orderDetail(id, CurrentMember.requireId());
+        MallOrderDetailDto detail = mallOrderService.orderStatus(id, CurrentMember.requireId());
         if (detail == null) {
             return Result.fail("订单不存在");
+        }
+        if (detail.getOrderStatus() == null) {
+            return Result.success(detail, "订单处理中");
         }
         return Result.success(detail);
     }

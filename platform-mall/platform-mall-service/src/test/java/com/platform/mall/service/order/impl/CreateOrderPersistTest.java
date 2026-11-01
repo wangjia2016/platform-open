@@ -10,6 +10,7 @@ import com.platform.mall.dao.order.mapper.MallOrderMapper;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.manager.cache.MallGoodsCacheManager;
+import com.platform.mall.manager.cache.OrderStatusCache;
 import com.platform.mall.service.flash.MallFlashSessionsService;
 import com.platform.mall.service.order.MallOrderDeliveryService;
 import com.platform.mall.service.order.MallOrderItemService;
@@ -52,7 +53,8 @@ class CreateOrderPersistTest {
                 goodsMapper,
                 mock(MallGoodsCacheManager.class),
                 mock(GoodsStockCache.class),
-                mock(MallFlashSessionsService.class));
+                mock(MallFlashSessionsService.class),
+                mock(OrderStatusCache.class));
     }
 
     @Test

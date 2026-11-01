@@ -5,6 +5,7 @@ import com.platform.mall.dao.order.entity.MallOrder;
 import com.platform.mall.dao.order.mapper.MallOrderItemMapper;
 import com.platform.mall.dao.order.mapper.MallOrderMapper;
 import com.platform.mall.dao.order.model.list.WxPayOrderNotifyResult;
+import com.platform.mall.manager.cache.OrderStatusCache;
 import com.platform.mall.service.feignClient.WechatFeignClient;
 import com.platform.mall.service.order.impl.MallOrderPayServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -43,7 +45,7 @@ class MallOrderPayNotifyTest {
 
     @BeforeEach
     void setUp() {
-        payService = new MallOrderPayServiceImpl(mallOrderMapper, wechatFeignClient, mallOrderItemMapper, mallOrderService);
+        payService = new MallOrderPayServiceImpl(mallOrderMapper, wechatFeignClient, mallOrderItemMapper, mallOrderService, mock(OrderStatusCache.class));
     }
 
     @Test

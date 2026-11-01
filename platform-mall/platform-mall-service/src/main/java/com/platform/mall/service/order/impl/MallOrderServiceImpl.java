@@ -37,6 +37,7 @@ import com.platform.mall.dao.order.model.query.MallOrderQuery;
 import com.platform.mall.dao.order.model.query.MallOrderRequestQuery;
 import com.platform.mall.manager.cache.GoodsStockCache;
 import com.platform.mall.manager.cache.MallGoodsCacheManager;
+import com.platform.mall.manager.cache.OrderStatusCache;
 import com.platform.mall.service.flash.MallFlashSessionsService;
 import com.platform.mall.service.order.MallOrderDeliveryService;
 import com.platform.mall.service.order.MallOrderItemService;
@@ -98,6 +99,8 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
     private final MallFlashSessionsService mallFlashSessionsService;
 
+    private final OrderStatusCache orderStatusCache;
+
     @Override
     public MallOrderDetailDto getOne(MallOrderQuery mallOrderQuery) {
         if (mallOrderQuery == null || (mallOrderQuery.getId() == null && mallOrderQuery.getOrderNo() == null)) {
@@ -134,6 +137,36 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         List<MallOrderItemListDto> mallOrderItemListDtos = MallOrderItemConverter.INSTANCE.toListDTO(mallOrderItems);
         orderDetail.setListMallOrderItem(mallOrderItemListDtos);
         return orderDetail;
+    }
+
+    @Override
+    public MallOrderDetailDto orderStatus(Long id, Long memberId) {
+        if (id == null || memberId == null) {
+            return null;
+        }
+        OrderStatusCache.Snapshot snapshot = orderStatusCache.get(id);
+        if (snapshot != null) {
+            if (!memberId.equals(snapshot.getMemberId())) {
+                return null;
+            }
+            return lightStatus(id, null, snapshot.getStatus());
+        }
+        MallOrder mallOrder = mallOrderMapper.selectOne(new QueryWrapper<MallOrder>()
+                .select("id", "member_id", "order_status", "order_no")
+                .eq("id", id));
+        if (mallOrder == null || !memberId.equals(mallOrder.getMemberId())) {
+            return null;
+        }
+        orderStatusCache.markStatus(id, memberId, mallOrder.getOrderStatus());
+        return lightStatus(id, mallOrder.getOrderNo(), mallOrder.getOrderStatus());
+    }
+
+    private static MallOrderDetailDto lightStatus(Long id, Long orderNo, Integer status) {
+        MallOrderDetailDto detail = new MallOrderDetailDto();
+        detail.setId(id);
+        detail.setOrderNo(orderNo);
+        detail.setOrderStatus(status);
+        return detail;
     }
 
     @Override
@@ -181,21 +214,34 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (updated == null || updated == 0) {
             throw new InsufficientStockException("商品库存不足,goodsId=" + goodsId);
         }
-        scheduleAfterCommit(orderId);
+        scheduleAfterCommit(orderId, mallOrder.getMemberId());
         return true;
     }
 
-    private void scheduleAfterCommit(Long orderId) {
+    private void scheduleAfterCommit(Long orderId, Long memberId) {
+        Runnable committed = () -> {
+            sendOrderTimers(orderId);
+            if (memberId != null) {
+                orderStatusCache.markStatus(orderId, memberId, MallOrderStatusConstant.TO_PAY.getTypeValue());
+            }
+        };
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    sendOrderTimers(orderId);
+                    committed.run();
+                }
+
+                @Override
+                public void afterCompletion(int status) {
+                    if (status == STATUS_ROLLED_BACK) {
+                        orderStatusCache.evict(orderId);
+                    }
                 }
             });
             return;
         }
-        sendOrderTimers(orderId);
+        committed.run();
     }
 
     private void sendOrderTimers(Long orderId) {
@@ -301,7 +347,22 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         List<MallOrderItem> items = mallOrderItemMapper.selectList(new QueryWrapper<MallOrderItem>().lambda()
                 .eq(MallOrderItem::getOrderId, id));
         restoreCacheAfterCommit(items);
+        publishStatus(id, mallOrder.getMemberId(), MallOrderStatusConstant.TRADE_CLOSED.getTypeValue());
         return Result.success("取消成功");
+    }
+
+    private void publishStatus(Long orderId, Long memberId, int status) {
+        Runnable publish = () -> orderStatusCache.markStatus(orderId, memberId, status);
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    publish.run();
+                }
+            });
+            return;
+        }
+        publish.run();
     }
 
     private void restoreCacheAfterCommit(List<MallOrderItem> items) {
@@ -389,17 +450,20 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
                                 return;
                             }
                             log.error("秒杀下单消息未被接收,已回补库存,orderId={}", orderId);
+                            orderStatusCache.evict(orderId);
                             restoreOnce.run();
                         }
 
                         @Override
                         public void onException(Throwable ex) {
                             log.error("秒杀下单消息发送失败,已回补库存,orderId={}", orderId, ex);
+                            orderStatusCache.evict(orderId);
                             restoreOnce.run();
                         }
                     },
                     SEND_TIMEOUT_MS);
         } catch (RuntimeException ex) {
+            orderStatusCache.evict(orderId);
             restoreOnce.run();
             log.error("秒杀下单消息发送失败,已回补库存,goodsId={}", goodsId, ex);
             throw new BusinessException("下单消息发送失败");
@@ -407,6 +471,7 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
         if (restored.get()) {
             throw new BusinessException("下单消息发送失败");
         }
+        orderStatusCache.markProcessing(orderId, mallOrderFlashRequestQuery.getMemberId());
         return true;
     }
 
@@ -461,7 +526,11 @@ public class MallOrderServiceImpl extends ServiceImpl<MallOrderMapper, MallOrder
 
     @Override
     public Boolean changOrderState(Long orderId, OrderStatusEnum beforeStatus, OrderStatusEnum afterStatus) {
-        return mallOrderMapper.changOrderState(orderId, beforeStatus, afterStatus);
+        Boolean updated = mallOrderMapper.changOrderState(orderId, beforeStatus, afterStatus);
+        if (Boolean.TRUE.equals(updated)) {
+            orderStatusCache.evict(orderId);
+        }
+        return updated;
     }
 
 }

@@ -12,6 +12,7 @@ import com.platform.mall.dao.order.mapper.MallOrderItemMapper;
 import com.platform.mall.dao.order.mapper.MallOrderMapper;
 import com.platform.mall.dao.order.model.list.WxPayOrderNotifyResult;
 import com.platform.mall.dao.order.model.query.MallOrderPayPortalRequest;
+import com.platform.mall.manager.cache.OrderStatusCache;
 import com.platform.mall.service.feignClient.WechatFeignClient;
 import com.platform.mall.service.order.MallOrderPayService;
 import com.platform.mall.service.order.MallOrderService;
@@ -40,6 +41,8 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
     private final MallOrderItemMapper mallOrderItemMapper;
 
     private final MallOrderService mallOrderService;
+
+    private final OrderStatusCache orderStatusCache;
 
     @Override
     public Result orderPay(MallOrderPayPortalRequest mallOrderPayPortalRequest, Long memberId) {
@@ -107,6 +110,7 @@ public class MallOrderPayServiceImpl implements MallOrderPayService {
             log.info("支付回调并发重复,orderNo={}", mallOrder.getOrderNo());
             return true;
         }
+        orderStatusCache.markStatus(mallOrder.getId(), mallOrder.getMemberId(), mallOrder.getOrderStatus());
         mallOrderService.asyncMsgProcess(mallOrder);
         return true;
     }
