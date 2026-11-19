@@ -31,7 +31,7 @@
         <xstream.version>1.4.20</xstream.version>
         <redisson.version>3.17.7</redisson.version>
         <springfox.version>3.0.0</springfox.version>
-        <jjwt.version>0.10.7</jjwt.version>
+        <jjwt.version>0.13.0</jjwt.version>
     </properties>
 
     <!-- Only truly shared compile/test deps; runtime stacks live on modules that use them. -->
